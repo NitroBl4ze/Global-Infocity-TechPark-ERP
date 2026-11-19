@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global InfoCity TechPark — HR & Facility Staffing</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="db.js"></script>
+    <script src="sidebar.js" defer></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand-title">
+            <div class="building-mark">
+                <span class="b-tower b-t1"></span>
+                <span class="b-tower b-t2"></span>
+                <span class="b-tower b-t3"></span>
+            </div>
+            <span>Global InfoCity TechPark</span>
+            <span class="brand-sub">HR, Leasing Talent & Facility Staffing</span>
+        </div>
+        <div class="nav-right">
+            <span id="userDisplay"></span>
+            <span class="badge">HR Operations</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+            <div class="sidebar-head">
+                <div class="sidebar-head-copy">
+                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
+                    <strong>HR Operations</strong>
+                    <small>Hiring & campus staffing</small>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
+            </div>
+            <nav class="sidebar-nav">
+        <section class="sidebar-group">
+            <div class="sidebar-label">People Operations</div>
+            <a class="nav-item active" data-view="hiring" href="hr.html?view=hiring" title="TechPark Hiring Pipeline"><span class="nav-icon" aria-hidden="true">♙</span><span class="nav-text">TechPark Hiring Pipeline</span></a>
+            <a class="nav-item" data-view="leaves" href="hr.html?view=leaves" title="Staff Leave Approvals"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-text">Staff Leave Approvals</span></a>
+        </section>
+            </nav>
+
+
+        </aside>
+
+        <div class="main-content">
+            <header class="page-heading"><div><span class="page-eyebrow">PEOPLE OPERATIONS</span><h1 id="hrPageTitle">TechPark Hiring Pipeline</h1><p id="hrPageDescription">Manage staffing requirements and active recruitment.</p></div></header>
+            <div class="crm-notice">
+                <div><strong>TechPark HR Operations:</strong> Manage recruitment for Commercial Leasing Executives, HVAC/BMS Facility Engineers, Campus Security, and Tenant Relations staff.</div>
+                <span class="pill-tag">Campus Staff: 96</span>
+            </div>
+
+            <div id="mod-hiring" class="mod-sec">
+                <div class="cards-grid">
+                    <div class="card blue"><h3>Total TechPark Staff</h3><div class="value" id="totalEmp">96</div></div>
+                    <div class="card green"><h3>Hired This Quarter</h3><div class="value" id="hiredCount">6</div></div>
+                    <div class="card red"><h3>Open Positions</h3><div class="value" id="openPos">4</div></div>
+                    <div class="card"><h3>Active Shifts</h3><div class="value">24x7 BMS Ops</div></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><h2>Post New TechPark Job Opening</h2></div>
+                    <div style="display:grid; grid-template-columns: 2fr 1.5fr 1fr; gap:10px;">
+                        <input type="text" id="jobTitle" placeholder="Job Role (e.g., Senior Commercial Leasing Executive)" style="margin:0;">
+                        <input type="text" id="jobDept" placeholder="Department (e.g., Leasing / Facility Engineering)" style="margin:0;">
+                        <button class="btn-primary" style="margin:0;" onclick="addOpening()">+ Publish Opening</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><h2>Active Recruitment Requisitions</h2></div>
+                    <table>
+                        <thead><tr><th>Role Title</th><th>Department</th><th>Applicants</th><th>Stage</th><th>Action</th></tr></thead>
+                        <tbody id="hiringTable">
+                            <tr>
+                                <td><strong>Commercial Leasing Executive (IT Parks)</strong></td>
+                                <td>Leasing Sales</td>
+                                <td>19 Candidates</td>
+                                <td><span class="pill-tag">Final Round</span></td>
+                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lead BMS & HVAC Facility Engineer</strong></td>
+                                <td>Tower Operations</td>
+                                <td>14 Candidates</td>
+                                <td><span class="pill-tag">Technical Assessment</span></td>
+                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tenant Fit-Out Coordinator</strong></td>
+                                <td>Project Management</td>
+                                <td>11 Candidates</td>
+                                <td><span class="pill-tag">HR Screening</span></td>
+                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Commercial Real Estate Finance Executive</strong></td>
+                                <td>Finance</td>
+                                <td>9 Candidates</td>
+                                <td><span class="pill-tag">Offer Released</span></td>
+                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-leaves" class="mod-sec hidden">
+                <div class="panel">
+                    <div class="panel-header"><h2>Employee Leave Requests</h2></div>
+                    <table>
+                        <thead><tr><th>Employee</th><th>Role / Dept</th><th>Leave Type</th><th>Duration</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <tr id="lv1">
+                                <td><strong>Karthik Raja</strong></td><td>Leasing Sales</td><td>Casual Leave</td><td>2 Days</td>
+                                <td>
+                                    <button class="btn-sm btn-success" onclick="decideLeave('lv1', 'Approved')">Approve</button>
+                                    <button class="btn-sm btn-danger" onclick="decideLeave('lv1', 'Rejected')">Reject</button>
+                                </td>
+                            </tr>
+                            <tr id="lv2">
+                                <td><strong>Arun Kumar</strong></td><td>Commercial Finance</td><td>Medical Leave</td><td>1 Day</td>
+                                <td>
+                                    <button class="btn-sm btn-success" onclick="decideLeave('lv2', 'Approved')">Approve</button>
+                                    <button class="btn-sm btn-danger" onclick="decideLeave('lv2', 'Rejected')">Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.role !== 'HR') window.location.href = 'index.html';
+        document.getElementById('userDisplay').innerText = currentUser.name;
+        activateHRView();
+
+        let staff = 96, hired = 6, open = 4;
+
+        function activateHRView() {
+            const requested = new URLSearchParams(window.location.search).get('view') || 'hiring';
+            const view = ['hiring', 'leaves'].includes(requested) ? requested : 'hiring';
+            document.querySelectorAll('.mod-sec').forEach(section => section.classList.toggle('hidden', section.id !== `mod-${view}`));
+            document.querySelectorAll('.sidebar [data-view]').forEach(link => link.classList.toggle('active', link.dataset.view === view));
+            document.getElementById('hrPageTitle').textContent = view === 'hiring' ? 'TechPark Hiring Pipeline' : 'Staff Leave Approvals';
+            document.getElementById('hrPageDescription').textContent = view === 'hiring' ? 'Manage staffing requirements and active recruitment.' : 'Review employee leave requests and record approval decisions.';
+        }
+        function switchMod(id) { window.location.href = `hr.html?view=${encodeURIComponent(id)}`; }
+
+        function addOpening() {
+            const role = document.getElementById('jobTitle').value.trim();
+            const dept = document.getElementById('jobDept').value.trim();
+            if (!role || !dept) return alert("Enter role and department!");
+            document.getElementById('hiringTable').innerHTML += `
+                <tr>
+                    <td><strong>${role}</strong></td>
+                    <td>${dept}</td>
+                    <td>1 Candidate</td>
+                    <td><span class="pill-tag">Open</span></td>
+                    <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
+                </tr>
+            `;
+            open++;
+            document.getElementById('openPos').innerText = open;
+            document.getElementById('jobTitle').value = '';
+            document.getElementById('jobDept').value = '';
+        }
+
+        function hireStaff() {
+            staff++;
+            hired++;
+            document.getElementById('totalEmp').innerText = staff;
+            document.getElementById('hiredCount').innerText = hired;
+            alert("Candidate onboarded into Global InfoCity TechPark staff directory!");
+        }
+
+        function decideLeave(id, status) {
+            document.getElementById(id).cells[4].innerHTML = `<span class="pill-tag">${status}</span>`;
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

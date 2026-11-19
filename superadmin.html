@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global InfoCity TechPark — Building Owner & SuperAdmin Command</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="db.js"></script>
+    <script src="sidebar.js" defer></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand-title">
+            <div class="building-mark">
+                <span class="b-tower b-t1"></span>
+                <span class="b-tower b-t2"></span>
+                <span class="b-tower b-t3"></span>
+            </div>
+            <span>Global InfoCity TechPark</span>
+            <span class="brand-sub">Commercial Building Owner & SuperAdmin Command Center</span>
+        </div>
+        <div class="nav-right">
+            <span id="userDisplay"></span>
+            <span class="badge">Owner & SuperAdmin</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+            <div class="sidebar-head">
+                <div class="sidebar-head-copy">
+                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
+                    <strong>Owner Command Center</strong>
+                    <small>Building & portfolio control</small>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
+            </div>
+            <nav class="sidebar-nav">
+        <section class="sidebar-group">
+            <div class="sidebar-label">Overview</div>
+            <a class="nav-item" data-view="pipeline" href="superadmin.html?view=pipeline" title="Pipeline"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-text">Pipeline</span></a>
+            <a class="nav-item" data-view="statistics" href="superadmin.html?view=statistics" title="Statistics"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-text">Statistics</span></a>
+            <a class="nav-item" data-view="floorplan" href="superadmin.html?view=floorplan" title="Floor Availability"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Floor Availability</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Sales Department</div>
+            <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-text">Sales</span></a>
+            <a class="nav-item" href="sales_manager.html?view=quotations" title="Sales Manager"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-text">Sales Manager</span></a>
+            <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Tenant & Asset Management</div>
+            <a class="nav-item" data-view="screening" href="superadmin.html?view=screening" title="Tenant Screening & KYC"><span class="nav-icon" aria-hidden="true">✓</span><span class="nav-text">Tenant Screening & KYC</span></a>
+            <a class="nav-item" data-view="agreements" href="superadmin.html?view=agreements" title="Lease Deed & Lock-In"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-text">Lease Deed & Lock-In</span></a>
+            <a class="nav-item" data-view="financials" href="superadmin.html?view=financials" title="Deposits, GST/TDS & CAM"><span class="nav-icon" aria-hidden="true">≋</span><span class="nav-text">Deposits, GST/TDS & CAM</span></a>
+            <a class="nav-item" data-view="utilities" href="superadmin.html?view=utilities" title="Utilities, Fit-Out & Fire NOC"><span class="nav-icon" aria-hidden="true">⚡</span><span class="nav-text">Utilities, Fit-Out & Fire NOC</span></a>
+            <a class="nav-item" data-view="proptax" href="superadmin.html?view=proptax" title="Property Tax & Insurance"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Property Tax & Insurance</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Administration</div>
+            <a class="nav-item" data-view="rbac" href="superadmin.html?view=rbac" title="Staff RBAC & IndexedDB"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-text">Staff RBAC & IndexedDB</span></a>
+        </section>
+            </nav>
+
+
+        </aside>
+
+        <div class="main-content">
+            <header class="page-heading">
+                <div><span class="page-eyebrow">OWNER COMMAND CENTER</span><h1 id="ownerPageTitle">Leasing Pipeline</h1><p id="ownerPageDescription">Review every company inquiry, assigned suite and sales-stage movement.</p></div>
+                <span class="page-heading-tag" id="ownerPageTag">Portfolio operations</span>
+            </header>
+            <div class="crm-notice" id="ownerContextBanner">
+                <div>
+                    <strong>Commercial Asset Protection Active:</strong> Full regulatory oversight on Tenant KYC, SRO Registered Lease Deeds, 6–10 Mo IFRSD Escrow, 18% GST / 10% TDS (Form 26AS), HT/LT Utility Meters, Fire NOC, and GCC Property Tax.
+                </div>
+                <span class="pill-tag">Asset Valuation: ₹250 Cr</span>
+            </div>
+
+            <div id="mod-pipeline" class="module-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Leasing Pipeline</h2>
+                        <span class="pill-tag">Call → Follow Up → Quotation → Booked / Lost</span>
+                    </div>
+                    <p class="subtitle">Select a company to review its lead, allocation, and sales activity.</p>
+                </div>
+                <div class="pipeline-board" id="adminKanbanBoard"></div>
+            </div>
+
+            <div id="mod-statistics" class="module-section hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>Total Pipeline Inquiries</h3>
+                        <div class="value" id="kpiTotalDeals">0</div>
+                    </div>
+                    <div class="card green">
+                        <h3>Booked Monthly Base Rent</h3>
+                        <div class="value" id="kpiBookedRent">₹0</div>
+                    </div>
+                    <div class="card">
+                        <h3>IFRSD Escrow Held (6–10 Mo)</h3>
+                        <div class="value" id="kpiTotalDeposit">₹0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Rejected / Lost Inquiries</h3>
+                        <div class="value" id="kpiLostCount">0</div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h2>Leasing Pipeline Value by Stage (₹ Monthly Rent)</h2></div>
+                        <div class="chart-box"><canvas id="adminStageBarChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Space Demand by Pipeline Stage</h2></div>
+                        <div class="chart-box"><canvas id="adminSqftPieChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Lead Sources</h2></div>
+                        <div class="chart-box"><canvas id="adminLeadSourceChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-floorplan" class="module-section hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Tower A, B & C Allocation</h2>
+                        <span style="font-size:12px; color:#5b6777;">Green = Vacant | Amber = In Pipeline | Teal = Booked</span>
+                    </div>
+                    <div class="towers-grid" id="adminTowersGrid"></div>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 PILLAR 1: TENANT SCREENING, BUSINESS VIABILITY, KYC & PERMITTED USE
+                 ================================================================= -->
+            <div id="mod-screening" class="module-section hidden">
+                <div class="cards-grid">
+                    <div class="card green">
+                        <h3>KYC & Viability Approved</h3>
+                        <div class="value" id="kycApprovedCount">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Pending Due Diligence</h3>
+                        <div class="value" id="kycPendingCount">0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Blocked (Permitted Use Violation)</h3>
+                        <div class="value" id="kycRejectedCount">0</div>
+                    </div>
+                    <div class="card blue">
+                        <h3>Permitted Campus Zoning</h3>
+                        <div class="value" style="font-size:17px;">IT / ITeS / R&D Only</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Onboard & Screen New Commercial Tenant (Due Diligence Gate)</h2>
+                    </div>
+                    <form id="newScreeningForm" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
+                        <input type="text" id="scCompany" placeholder="Company Legal Name" required style="margin:0;">
+                        <select id="scSource" required style="margin:0;">
+                            <option value="" disabled selected>Lead source</option>
+                            <option>WhatsApp</option>
+                            <option>Instagram</option>
+                            <option>Website</option>
+                            <option>Referral</option>
+                            <option>Direct</option>
+                        </select>
+                        <select id="scUnit" style="margin:0;">
+                            <option value="Tower A - Floor 2 (20,000 sq.ft)|20000|85">Tower A - Floor 2 (20,000 sq.ft)</option>
+                            <option value="Tower B - Floor 5 (15,000 sq.ft)|15000|82">Tower B - Floor 5 (15,000 sq.ft)</option>
+                            <option value="Tower C - Floor 3 (10,000 sq.ft)|10000|75">Tower C - Floor 3 (10,000 sq.ft)</option>
+                        </select>
+                        <input type="text" id="scPan" placeholder="Company PAN (e.g. AAACW1122K)" required style="margin:0;">
+                        <input type="text" id="scGstin" placeholder="GSTIN (e.g. 33AAACW1122K1Z5)" required style="margin:0;">
+                        <input type="text" id="scCin" placeholder="Incorporation CIN / Deed No." required style="margin:0;">
+                        <input type="text" id="scViability" placeholder="Financials & Bank Guarantee (e.g. ₹50L BG)" required style="margin:0;">
+                        <select id="scPermittedUse" style="margin:0;">
+                            <option value="IT/ITeS Software Development Office">Permitted: IT/ITeS Software Office</option>
+                            <option value="AI R&D & Data Analytics Lab">Permitted: AI R&D & Data Lab</option>
+                            <option value="PROHIBITED: Cloud Kitchen / F&B Exhaust">RESTRICTED: Cloud Kitchen / Heavy Exhaust</option>
+                            <option value="PROHIBITED: Heavy Manufacturing Unit">RESTRICTED: Heavy Manufacturing Unit</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="margin:0;">Run Screening & Add</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Tenant Screening, KYC Registry & Permitted Use Verification</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tenant & Unit</th>
+                                <th>Lead Source</th>
+                                <th>Business Viability & Financials</th>
+                                <th>Company PAN, GSTIN & CIN</th>
+                                <th>Signatory KYC</th>
+                                <th>Permitted Use Classification</th>
+                                <th>Due Diligence Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screeningTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 PILLAR 2: COMMERCIAL LEASE AGREEMENT, LOCK-IN & ESCALATION
+                 ================================================================= -->
+            <div id="mod-agreements" class="module-section hidden">
+                <div class="grid-2">
+                    <!-- Interactive Lock-In Early Exit Liability Calculator -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Lock-In Period Breach & Early-Exit Liability Calculator</h2>
+                        </div>
+                        <p style="font-size:12.5px; color:#5b6777; margin-bottom:12px;">
+                            If a commercial tenant vacates before their <strong>Lock-In Period (1–3 Years)</strong> expires, they are legally liable to pay rent for the remaining lock-in months.
+                        </p>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div>
+                                <label style="font-size:11.5px; font-weight:600;">Select Booked/Active Tenant</label>
+                                <select id="calcTenantSelect" onchange="calculateLockInLiability()"></select>
+                            </div>
+                            <div>
+                                <label style="font-size:11.5px; font-weight:600;">Months Completed by Tenant</label>
+                                <input type="number" id="calcElapsedInput" value="14" min="0" max="60" onchange="calculateLockInLiability()">
+                            </div>
+                        </div>
+                        <div id="lockInCalcResult" style="background:#f8fafc; border:1px solid #cbd5e1; border-left:4px solid #b91c1c; padding:12px; border-radius:4px; font-size:13px; line-height:1.6;"></div>
+                    </div>
+
+                    <!-- Interactive Rent Escalation Simulator -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Automatic Rent Escalation Clause Projector (5–8% Yr / 15% 3-Yr)</h2>
+                        </div>
+                        <p style="font-size:12.5px; color:#5b6777; margin-bottom:12px;">
+                            Project multi-year compounded rent growth built directly into the registered lease deed.
+                        </p>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div>
+                                <label style="font-size:11.5px; font-weight:600;">Current Monthly Base Rent (₹)</label>
+                                <input type="number" id="escBaseRent" value="1615000" onchange="calculateEscalation()">
+                            </div>
+                            <div>
+                                <label style="font-size:11.5px; font-weight:600;">Escalation Clause Model</label>
+                                <select id="escModel" onchange="calculateEscalation()">
+                                    <option value="15_3yr">15% Escalation Every 3 Years (IT Park Standard)</option>
+                                    <option value="6_annual">6% Annual Escalation</option>
+                                    <option value="8_annual">8% Annual Escalation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="escalationResult" style="background:#f8fafc; border:1px solid #cbd5e1; border-left:4px solid #0f4c5c; padding:12px; border-radius:4px; font-size:13px; line-height:1.6;"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Master Commercial Lease Agreements (Lock-In, Notice, Sub-Leasing & SRO Deed Registration)</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tenant & Unit</th>
+                                <th>Tenure & Lock-In</th>
+                                <th>Notice Period</th>
+                                <th>Escalation Clause</th>
+                                <th>Sub-Leasing Rule</th>
+                                <th>Sub-Registrar (SRO) Stamp & Deed Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agreementsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 PILLAR 3: SECURITY DEPOSITS (IFRSD), 18% GST, 10% TDS & CAM LEDGER
+                 ================================================================= -->
+            <div id="mod-financials" class="module-section hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>IFRSD Escrow Held (6–10 Mo)</h3>
+                        <div class="value" id="finEscrowTotal">₹0</div>
+                    </div>
+                    <div class="card green">
+                        <h3>Monthly Base Rent + CAM</h3>
+                        <div class="value" id="finTaxableTotal">₹0</div>
+                    </div>
+                    <div class="card">
+                        <h3>18% GST Output Liability</h3>
+                        <div class="value" id="finGstTotal">₹0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>10% TDS Deducted (Form 26AS)</h3>
+                        <div class="value" id="finTdsTotal">₹0</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>3A. Tenant Security Deposit (IFRSD), 18% GST, 10% TDS Deduction & Form 26AS Reconciliation</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Booked / Active Tenant</th>
+                                <th>IFRSD Security Deposit</th>
+                                <th>Base Rent + CAM (₹14/Sq.Ft)</th>
+                                <th>+ 18% GST</th>
+                                <th>- 10% TDS (Sec 194-I)</th>
+                                <th>Net Bank Payout</th>
+                                <th>Form 26AS Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taxDepositTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- CAM Expense Breakdown Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>3B. Common Area Maintenance (CAM @ ₹14/Sq.Ft) — Monthly Cost Allocation</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>CAM Infrastructure Head</th>
+                                <th>Vendor / SLA</th>
+                                <th>Rate Allocation / Sq.Ft</th>
+                                <th>Monthly Campus Outflow</th>
+                                <th>Recovery Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>24x7 Armed Campus Security & Boom Barriers</strong></td>
+                                <td>SIS Enterprise Security</td>
+                                <td>₹4.00 / Sq.Ft</td>
+                                <td>₹3,20,000</td>
+                                <td><span class="pill-tag">Recovered via CAM</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>High-Speed Elevators & Escalator AMC</strong></td>
+                                <td>Mitsubishi Elevators India</td>
+                                <td>₹2.50 / Sq.Ft</td>
+                                <td>₹2,00,000</td>
+                                <td><span class="pill-tag">Recovered via CAM</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>100% DG Set Diesel Backup & Chiller Plant O&M</strong></td>
+                                <td>Cummins Power Generation</td>
+                                <td>₹4.20 / Sq.Ft</td>
+                                <td>₹3,36,000</td>
+                                <td><span class="pill-tag">Recovered via CAM</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lobby Housekeeping, Facade Glass & Landscaping</strong></td>
+                                <td>Updater Services (UDS)</td>
+                                <td>₹2.10 / Sq.Ft</td>
+                                <td>₹1,68,000</td>
+                                <td><span class="pill-tag">Recovered via CAM</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Common Corridor LED Lighting & STP Water Treatment</strong></td>
+                                <td>TNEB Common Tariff Meter</td>
+                                <td>₹1.20 / Sq.Ft</td>
+                                <td>₹96,000</td>
+                                <td><span class="pill-tag">Recovered via CAM</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 PILLAR 4: BUILDING OPERATIONS, UTILITY METERS, FIT-OUT & FIRE NOC
+                 ================================================================= -->
+            <div id="mod-utilities" class="module-section hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>4A. Commercial Utility Sub-Meters (TNEB HT/LT & Water Handover Readings) & Fit-Out Compliance</h2>
+                    </div>
+                    <p style="font-size:12.5px; color:#5b6777; margin-bottom:12px;">
+                        All electricity and water connections run on commercial tariff. Tenants are strictly prohibited from altering load-bearing pillars or external glass facades and must restore units to original warm-shell state upon exit.
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tenant & Unit</th>
+                                <th>TNEB Commercial Meter</th>
+                                <th>Handover EB Reading</th>
+                                <th>Water Meter & Handover</th>
+                                <th>Structural & Fit-Out Restoration Rule</th>
+                            </tr>
+                        </thead>
+                        <tbody id="utilityFitoutTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>4B. Core Building Fire & Life Safety Infrastructure Registry</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Safety System / Statutory NOC</th>
+                                <th>Certificate / AMC Ref</th>
+                                <th>Validity / Inspection Cycle</th>
+                                <th>Annual Cost</th>
+                                <th>Compliance Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fireSafetyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 PILLAR 5: MUNICIPAL PROPERTY TAX & BUILDING INSURANCE
+                 ================================================================= -->
+            <div id="mod-proptax" class="module-section hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>5A. Municipal Commercial Property Tax, Water/Sewage Tax & Master Building Insurance</h2>
+                        <button class="btn-sm btn-success" onclick="logNewTaxOrPolicy()">+ Record Tax / Policy Renewal</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Statutory Category</th>
+                                <th>Tax / Insurance Policy Description</th>
+                                <th>Receipt / Policy Number</th>
+                                <th>Assessment / Validity</th>
+                                <th>Amount Paid</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="propTaxInsuranceTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>5B. Tenant-Level Interior & Equipment Insurance Compliance</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tenant Company</th>
+                                <th>Occupied Unit</th>
+                                <th>Tenant Interior & Equipment Policy</th>
+                                <th>Update Policy Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tenantInsuranceTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 MODULE 6: STAFF RBAC & LIVE INDEXEDDB EXPLORER
+                 ================================================================= -->
+            <div id="mod-rbac" class="module-section hidden">
+                <div class="panel">
+                    <div class="panel-header"><h2>Staff Directory & Role Permissions</h2></div>
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><th>Username</th><th>Role</th><th>Authority Scope</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>IndexedDB Live Explorer (GlobalInfoCity_DB v2)</h2>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-sm btn-info" onclick="selectStore('leases')">leases</button>
+                            <button class="btn-sm btn-info" onclick="selectStore('building_compliance')">building_compliance</button>
+                            <button class="btn-sm btn-info" onclick="selectStore('users')">users</button>
+                            <button class="btn-sm btn-warn" onclick="resetSeeds()">Reset Default Park Data</button>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="grid-template-columns: 1.5fr 1fr;">
+                        <div style="overflow-x:auto;">
+                            <h3 id="storeTitle" style="margin-bottom:10px;">Active Store: leases</h3>
+                            <table>
+                                <thead id="idbHead"></thead>
+                                <tbody id="idbBody"></tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom:10px;">Transactional JSON Editor (store.put)</h3>
+                            <textarea id="idbEditor" rows="11" style="font-family:'IBM Plex Mono', monospace; font-size:12px;"></textarea>
+                            <button class="btn-primary" onclick="saveIDBRecord()">Commit to IndexedDB</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <aside class="detail-drawer hidden" id="leaseDetailDrawer" aria-labelledby="leaseDetailTitle" aria-modal="true" role="dialog">
+        <div class="detail-drawer-header">
+            <div>
+                <span class="drawer-eyebrow">Lead details</span>
+                <h2 id="leaseDetailTitle">Company</h2>
+            </div>
+            <button type="button" class="drawer-close" onclick="closeLeaseDetails()" aria-label="Close details">×</button>
+        </div>
+        <div id="leaseDetailContent" class="detail-drawer-content"></div>
+    </aside>
+    <div id="drawerBackdrop" class="drawer-backdrop hidden" onclick="closeLeaseDetails()"></div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.role !== 'SuperAdmin') window.location.href = 'index.html';
+        document.getElementById('userDisplay').innerText = currentUser.name;
+
+        const STAGES = ["Leads", "Call", "Follow Up", "Quotation", "Booked", "Lost"];
+        let barChartInstance = null, pieChartInstance = null, leadSourceChartInstance = null;
+
+        const MASTER_SUITES = [
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 9 (30,000 sq.ft)", floor: "Floor 9", sqft: 30000, rate: 90 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 6 (22,000 sq.ft)", floor: "Floor 6", sqft: 22000, rate: 86 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 4 (20,000 sq.ft)", floor: "Floor 4", sqft: 20000, rate: 85 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 2 (20,000 sq.ft)", floor: "Floor 2", sqft: 20000, rate: 85 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 8 (16,000 sq.ft)", floor: "Floor 8", sqft: 16000, rate: 80 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 7 (15,000 sq.ft)", floor: "Floor 7", sqft: 15000, rate: 82 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 5 (15,000 sq.ft)", floor: "Floor 5", sqft: 15000, rate: 82 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 3 (18,000 sq.ft)", floor: "Floor 3", sqft: 18000, rate: 80 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 5 (10,000 sq.ft)", floor: "Floor 5", sqft: 10000, rate: 75 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 4 (12,000 sq.ft)", floor: "Floor 4", sqft: 12000, rate: 76 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 3 (10,000 sq.ft)", floor: "Floor 3", sqft: 10000, rate: 75 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 2 (12,000 sq.ft)", floor: "Floor 2", sqft: 12000, rate: 78 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 1 (8,000 sq.ft)", floor: "Floor 1", sqft: 8000, rate: 75 }
+        ];
+
+        const OWNER_VIEW_META = {
+            pipeline: { title: 'Leasing Pipeline', description: 'Review company inquiries across the full leasing lifecycle, with lead source and allocated space visible on every record.', tag: 'Pipeline overview' },
+            statistics: { title: 'Portfolio Statistics', description: 'Track inquiry volume, booked monthly rent, deposits, lost opportunities and lead acquisition sources.', tag: 'Performance insights' },
+            floorplan: { title: 'Floor Availability', description: 'See how Tower A, Tower B and Tower C suites are allocated, in negotiation or vacant.', tag: 'Space allocation' },
+            screening: { title: 'Tenant Screening & KYC', description: 'Review tenant due diligence, company verification and permitted business use.', tag: 'Tenant compliance' },
+            agreements: { title: 'Lease Deed & Lock-In', description: 'Monitor registered lease documents, commercial terms, lock-in periods and renewals.', tag: 'Lease administration' },
+            financials: { title: 'Deposits, GST/TDS & CAM', description: 'Review security deposits, tax settings, maintenance charges and payment reconciliation.', tag: 'Commercial finance' },
+            utilities: { title: 'Utilities, Fit-Out & Fire NOC', description: 'Track utility handover readings, fit-out compliance and campus safety documentation.', tag: 'Facility compliance' },
+            proptax: { title: 'Property Tax & Insurance', description: 'Review municipal dues, property tax payments and tenant insurance records.', tag: 'Asset protection' },
+            rbac: { title: 'Staff RBAC & IndexedDB', description: 'Manage staff access roles and inspect the local demonstration database.', tag: 'Administration' }
+        };
+
+        function activateOwnerView() {
+            const requested = new URLSearchParams(window.location.search).get('view') || 'pipeline';
+            const view = OWNER_VIEW_META[requested] ? requested : 'pipeline';
+            document.querySelectorAll('.module-section').forEach(section => section.classList.toggle('hidden', section.id !== `mod-${view}`));
+            document.querySelectorAll('.sidebar [data-view]').forEach(link => {
+                const active = link.dataset.view === view;
+                link.classList.toggle('active', active);
+                if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+            });
+            const meta = OWNER_VIEW_META[view];
+            document.getElementById('ownerPageTitle').textContent = meta.title;
+            document.getElementById('ownerPageDescription').textContent = meta.description;
+            document.getElementById('ownerPageTag').textContent = meta.tag;
+            document.title = `Global InfoCity TechPark — ${meta.title}`;
+            document.getElementById('ownerContextBanner').classList.toggle('hidden', view !== 'pipeline');
+            return view;
+        }
+
+        function switchModule(modId) {
+            if (!OWNER_VIEW_META[modId]) return;
+            window.location.href = `superadmin.html?view=${encodeURIComponent(modId)}`;
+        }
+
+        function renderAllOwnerModules() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const compliance = JSON.parse(localStorage.getItem('infocity_compliance')) || [];
+
+            renderMasterPipelineAndFloor(leases);
+            renderPillar1Screening(leases);
+            renderPillar2Agreements(leases);
+            renderPillar3Financials(leases);
+            renderPillar4UtilitiesAndFire(leases, compliance);
+            renderPillar5PropTaxAndInsurance(leases, compliance);
+            loadUsers();
+        }
+
+        /* Pipeline, statistics, and floor availability */
+        function renderMasterPipelineAndFloor(leases) {
+            document.getElementById('kpiTotalDeals').innerText = leases.length;
+            let bookedRent = 0, totalDeposit = 0, lostCount = 0;
+            const stageRentTotals = { "Leads": 0, "Call": 0, "Follow Up": 0, "Quotation": 0, "Booked": 0, "Lost": 0 };
+            const stageSqftTotals = { "Leads": 0, "Call": 0, "Follow Up": 0, "Quotation": 0, "Booked": 0, "Lost": 0 };
+            const leadSourceTotals = {};
+
+            leases.forEach(l => {
+                const netRent = window.InfoCityDB.calcRent(l);
+                stageRentTotals[l.stage] = (stageRentTotals[l.stage] || 0) + netRent;
+                stageSqftTotals[l.stage] = (stageSqftTotals[l.stage] || 0) + Number(l.sqft);
+                const leadSource = l.source || 'Not recorded';
+                leadSourceTotals[leadSource] = (leadSourceTotals[leadSource] || 0) + 1;
+                if (l.stage === "Booked") {
+                    bookedRent += netRent;
+                    totalDeposit += netRent * Number(l.depositMonths || 6);
+                }
+                if (l.stage === "Lost") lostCount++;
+            });
+
+            document.getElementById('kpiBookedRent').innerText = `₹${bookedRent.toLocaleString('en-IN')}`;
+            document.getElementById('kpiTotalDeposit').innerText = `₹${totalDeposit.toLocaleString('en-IN')}`;
+            document.getElementById('kpiLostCount').innerText = lostCount;
+
+            document.getElementById('adminKanbanBoard').innerHTML = STAGES.map(stage => {
+                const items = leases.filter(l => l.stage === stage);
+                return `
+                    <div class="stage-col stage-${stage.replace(' ', '')}">
+                        <div class="stage-header"><span>${stage}</span><span class="pill-tag">${items.length}</span></div>
+                        ${items.map(item => `
+                            <div class="lease-card">
+                                <h4>${item.company}</h4>
+                                <div class="lease-meta">${item.towerUnit}<br>Lead source: <strong>${item.source || 'Not recorded'}</strong><br>Sales owner: <strong>${item.rep || 'Unassigned'}</strong><br>Use: <strong>${item.permittedUse || 'IT Office'}</strong></div>
+                                <div class="lease-price">₹${window.InfoCityDB.calcRent(item).toLocaleString('en-IN')}/mo</div>
+                                <button type="button" class="btn-sm btn-info" onclick="openLeaseDetails(${item.id})">View details</button>
+                                <select onchange="adminMoveStage(${item.id}, this.value)" style="margin:4px 0 0; padding:4px; font-size:11.5px;">
+                                    ${STAGES.map(s => `<option value="${s}" ${item.stage===s?'selected':''}>Stage: ${s}</option>`).join('')}
+                                </select>
+                            </div>
+                        `).join('') || `<div style="font-size:12px; color:#94a3b8; text-align:center; margin-top:20px;">Empty</div>`}
+                    </div>
+                `;
+            }).join('');
+
+            // Charts
+            const bCtx = document.getElementById('adminStageBarChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(bCtx, {
+                type: 'bar',
+                data: {
+                    labels: STAGES,
+                    datasets: [{ label: 'Monthly Rent (₹)', data: Object.values(stageRentTotals), backgroundColor: ['#64748b', '#0284c7', '#d97706', '#7c3aed', '#15803d', '#b91c1c'], borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const pCtx = document.getElementById('adminSqftPieChart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(pCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: STAGES,
+                    datasets: [{ data: Object.values(stageSqftTotals), backgroundColor: ['#64748b', '#0284c7', '#d97706', '#7c3aed', '#15803d', '#b91c1c'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const sourceCanvas = document.getElementById('adminLeadSourceChart');
+            if (sourceCanvas) {
+                if (leadSourceChartInstance) leadSourceChartInstance.destroy();
+                leadSourceChartInstance = new Chart(sourceCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: Object.keys(leadSourceTotals), datasets: [{ label: 'Inquiries', data: Object.values(leadSourceTotals), backgroundColor: '#0f4c5c', borderRadius: 7 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+
+            // Floor Plan Grid
+            const towers = ["Tower A (OMR Frontage)", "Tower B (SEZ IT Block)", "Tower C (Plug & Play Suites)"];
+            document.getElementById('adminTowersGrid').innerHTML = towers.map(tName => {
+                const suites = MASTER_SUITES.filter(s => s.tower === tName);
+                return `
+                    <div class="tower-shell">
+                        <div class="tower-shell-header"><h3>${tName}</h3><span class="pill-tag">${suites.length} Suites</span></div>
+                        ${suites.map(suite => {
+                            const active = leases.find(l => l.towerUnit === suite.unitLabel && l.stage !== "Lost");
+                            const cls = active ? (active.stage === "Booked" ? "booked" : "pipeline") : "vacant";
+                            const badge = active ? active.stage.toUpperCase() : "VACANT";
+                            return `
+                                <div class="suite-card ${cls}">
+                                    <div class="suite-top">
+                                        <span class="suite-title">${suite.floor} (${suite.sqft.toLocaleString('en-IN')} Sq.Ft)</span>
+                                        <span class="status-pill ${cls}">${badge}</span>
+                                    </div>
+                                    <div class="suite-tenant-box">
+                                        ${active ? `<div><strong>${active.company}</strong><br><span style="font-size:11.5px;color:#62748a;">Assigned to ${active.rep || 'Unassigned'}</span></div>` : `<span style="color:#15803d; font-weight:600;">Available for allocation</span>`}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openLeaseDetails(id) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const lease = leases.find(item => item.id === id);
+            if (!lease) return;
+
+            document.getElementById('leaseDetailTitle').innerText = lease.company;
+            document.getElementById('leaseDetailContent').innerHTML = `
+                <div class="detail-status">${lease.stage}</div>
+                <dl class="detail-list">
+                    <div><dt>Lead source</dt><dd>${lease.source || 'Not recorded'}</dd></div>
+                    <div><dt>Allocated space</dt><dd>${lease.towerUnit || 'Not assigned'}</dd></div>
+                    <div><dt>Company size</dt><dd>${Number(lease.sqft || 0).toLocaleString('en-IN')} sq.ft</dd></div>
+                    <div><dt>Monthly rent</dt><dd>₹${window.InfoCityDB.calcRent(lease).toLocaleString('en-IN')}</dd></div>
+                    <div><dt>Sales owner</dt><dd>${lease.rep || 'Unassigned'}</dd></div>
+                    <div><dt>Quotation status</dt><dd>${lease.quoteStatus || 'Not requested'}</dd></div>
+                    <div><dt>Notes</dt><dd>${lease.notes || 'No notes yet'}</dd></div>
+                </dl>`;
+            document.getElementById('leaseDetailDrawer').classList.remove('hidden');
+            document.getElementById('drawerBackdrop').classList.remove('hidden');
+        }
+
+        function closeLeaseDetails() {
+            document.getElementById('leaseDetailDrawer').classList.add('hidden');
+            document.getElementById('drawerBackdrop').classList.add('hidden');
+        }
+
+        function adminMoveStage(id, newStage) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const idx = leases.findIndex(l => l.id === id);
+            if (idx === -1) return;
+            leases[idx].stage = newStage;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        /* PILLAR 1: TENANT SCREENING & KYC */
+        function renderPillar1Screening(leases) {
+            let app = 0, pend = 0, rej = 0;
+            leases.forEach(l => {
+                if (l.kycApproved === "Approved") app++;
+                else if (String(l.kycApproved).includes("Rejected")) rej++;
+                else pend++;
+            });
+            document.getElementById('kycApprovedCount').innerText = app;
+            document.getElementById('kycPendingCount').innerText = pend;
+            document.getElementById('kycRejectedCount').innerText = rej;
+
+            document.getElementById('screeningTableBody').innerHTML = leases.map(l => {
+                const isProhibited = String(l.permittedUse).includes("PROHIBITED");
+                return `
+                    <tr>
+                        <td><strong>${l.company}</strong><br><span style="font-size:11.5px; color:#5b6777;">${l.towerUnit}</span></td>
+                        <td>${l.source || 'Not recorded'}</td>
+                        <td>${l.viabilityStatus || 'Standard Review'}</td>
+                        <td>
+                            PAN: <code>${l.companyPan || 'N/A'}</code><br>
+                            GST: <code>${l.gstin || 'N/A'}</code><br>
+                            CIN: <code>${l.cinNo || 'N/A'}</code>
+                        </td>
+                        <td><span style="font-size:12px;">${l.signatoryKyc || 'Signatory PAN Verified | UIDAI: [Aadhaar Redacted]'}</span></td>
+                        <td style="color:${isProhibited ? '#b91c1c' : '#15803d'}; font-weight:700;">${l.permittedUse || 'IT/ITeS Office'}</td>
+                        <td>
+                            <span class="pill-tag" style="margin-bottom:4px; display:inline-block;">${l.kycApproved || 'Pending'}</span><br>
+                            <button class="btn-sm btn-success" onclick="decideKyc(${l.id}, 'Approved')">Approve KYC</button>
+                            <button class="btn-sm btn-danger" onclick="decideKyc(${l.id}, 'Rejected (Permitted Use / KYC Violation)')">Reject & Block</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function decideKyc(id, status) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].kycApproved = status;
+            if (status.includes("Rejected")) {
+                leases[idx].stage = "Lost";
+            }
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        document.getElementById('newScreeningForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const [towerUnit, sqft, rate] = document.getElementById('scUnit').value.split('|');
+            const use = document.getElementById('scPermittedUse').value;
+            const isProhibited = use.includes("PROHIBITED");
+
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            leases.unshift({
+                id: Date.now(),
+                company: document.getElementById('scCompany').value.trim(),
+                source: document.getElementById('scSource').value,
+                towerUnit,
+                sqft: Number(sqft),
+                ratePerSqft: Number(rate),
+                discountPct: 0,
+                stage: isProhibited ? "Lost" : "Leads",
+                rep: "Karthik Raja",
+                quoteStatus: isProhibited ? "Blocked by Permitted Use Rule" : "Screened",
+                invoiceStatus: "Pending",
+                fitoutCost: Math.round(Number(sqft) * 30),
+                notes: isProhibited ? "Auto-rejected: Non-IT high wear-and-tear activity." : "Passed initial KYC & viability screening.",
+                viabilityStatus: document.getElementById('scViability').value.trim(),
+                companyPan: document.getElementById('scPan').value.trim().toUpperCase(),
+                gstin: document.getElementById('scGstin').value.trim().toUpperCase(),
+                cinNo: document.getElementById('scCin').value.trim().toUpperCase(),
+                signatoryKyc: "Signatory PAN Verified | UIDAI: [Aadhaar Redacted]",
+                permittedUse: use,
+                kycApproved: isProhibited ? "Rejected (Permitted Use Violation)" : "Approved",
+                tenureMonths: 60,
+                lockInMonths: 36,
+                elapsedMonths: 0,
+                noticeMonths: 3,
+                escalationRule: "15% every 3 Years",
+                subLeaseAllowed: "Strictly Prohibited (No NOC)",
+                sroRegNo: "Pending Execution (>11 Mo Compulsory Registration)",
+                depositMonths: 6,
+                camPerSqft: 14,
+                form26asStatus: "Pending Billing",
+                ebMeterNo: `TNEB-HT-09-${Math.floor(44110 + Math.random() * 80)}`,
+                ebHandoverReading: "1,000 kWh",
+                waterMeterNo: `CMWSSB-COM-${Math.floor(910 + Math.random() * 80)}`,
+                waterHandoverReading: "100 kL",
+                fitoutCompliance: "Standard Warm-Shell Clause",
+                tenantInsurance: "Pending Tenant Policy"
+            });
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+            alert(isProhibited ? "Alert: Tenant flagged & moved to 'Lost' due to Prohibited Permitted Use (Cloud Kitchen/Manufacturing)!" : "Tenant KYC screened and added to pipeline!");
+            this.reset();
+        });
+
+        /* PILLAR 2: COMMERCIAL LEASE AGREEMENTS, LOCK-IN & ESCALATION */
+        function renderPillar2Agreements(leases) {
+            const activeLeases = leases.filter(l => l.stage !== "Lost");
+            const selectEl = document.getElementById('calcTenantSelect');
+            if (selectEl.options.length !== activeLeases.length) {
+                selectEl.innerHTML = activeLeases.map(l => `<option value="${l.id}">${l.company} (Lock-In: ${l.lockInMonths || 36} Mo)</option>`).join('');
+            }
+            calculateLockInLiability();
+            calculateEscalation();
+
+            document.getElementById('agreementsTableBody').innerHTML = leases.map(l => `
+                <tr>
+                    <td><strong>${l.company}</strong><br><span style="font-size:11.5px; color:#5b6777;">${l.towerUnit}</span></td>
+                    <td>Tenure: <strong>${l.tenureMonths || 60} Mo</strong><br>Lock-In: <strong style="color:#0f4c5c;">${l.lockInMonths || 36} Mo</strong></td>
+                    <td><strong>${l.noticeMonths || 3} Months</strong><br><span style="font-size:11px; color:#64748b;">Post Lock-In</span></td>
+                    <td><span class="pill-tag">${l.escalationRule || '15% every 3 Years'}</span></td>
+                    <td style="color:#b91c1c; font-weight:600;">${l.subLeaseAllowed || 'Strictly Prohibited'}</td>
+                    <td>
+                        <code>${l.sroRegNo || 'Pending SRO Deed'}</code><br>
+                        <button class="btn-sm btn-info" style="margin-top:4px;" onclick="markSroRegistered(${l.id})">Mark SRO Registered</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function calculateLockInLiability() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const id = Number(document.getElementById('calcTenantSelect').value);
+            const elapsed = Number(document.getElementById('calcElapsedInput').value || 0);
+            const item = leases.find(l => l.id === id) || leases[0];
+            if (!item) return;
+
+            const lockIn = Number(item.lockInMonths || 36);
+            const netRent = window.InfoCityDB.calcRent(item);
+            const remainingLockIn = Math.max(0, lockIn - elapsed);
+            const penaltyLiability = remainingLockIn * netRent;
+
+            document.getElementById('lockInCalcResult').innerHTML = remainingLockIn > 0
+                ? `<strong>Lock-In Active (${remainingLockIn} Months Remaining):</strong> If <strong>${item.company}</strong> vacates at month ${elapsed}, they must pay <strong>₹${penaltyLiability.toLocaleString('en-IN')}</strong> (${remainingLockIn} mo × ₹${netRent.toLocaleString('en-IN')}) as mandatory Lock-In Exit Compensation.`
+                : `<strong style="color:#15803d;">Lock-In Completed:</strong> Tenant has completed the ${lockIn}-month lock-in and may exit by serving a <strong>${item.noticeMonths || 3}-Month Notice Period</strong>.`;
+        }
+
+        function calculateEscalation() {
+            const base = Number(document.getElementById('escBaseRent').value || 1000000);
+            const model = document.getElementById('escModel').value;
+            let yr2 = base, yr3 = base, yr4 = base;
+
+            if (model === "15_3yr") {
+                yr2 = base;
+                yr3 = base;
+                yr4 = Math.round(base * 1.15);
+            } else if (model === "6_annual") {
+                yr2 = Math.round(base * 1.06);
+                yr3 = Math.round(yr2 * 1.06);
+                yr4 = Math.round(yr3 * 1.06);
+            } else {
+                yr2 = Math.round(base * 1.08);
+                yr3 = Math.round(yr2 * 1.08);
+                yr4 = Math.round(yr3 * 1.08);
+            }
+
+            document.getElementById('escalationResult').innerHTML = `
+                <strong>Escalated Monthly Rent Schedule:</strong><br>
+                • Year 1: <strong>₹${base.toLocaleString('en-IN')}/mo</strong> | Year 2: <strong>₹${yr2.toLocaleString('en-IN')}/mo</strong><br>
+                • Year 3: <strong>₹${yr3.toLocaleString('en-IN')}/mo</strong> | Year 4 (Escalated): <strong style="color:#15803d;">₹${yr4.toLocaleString('en-IN')}/mo</strong>
+            `;
+        }
+
+        function markSroRegistered(id) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].sroRegNo = `SRO-NEELANKARAI-${Math.floor(5200 + Math.random() * 900)}/2026 (Registered)`;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        /* PILLAR 3: SECURITY DEPOSITS, 18% GST, 10% TDS & FORM 26AS */
+        function renderPillar3Financials(leases) {
+            const active = leases.filter(l => l.stage === "Booked" || l.stage === "Quotation");
+            let escrowSum = 0, taxableSum = 0, gstSum = 0, tdsSum = 0;
+
+            document.getElementById('taxDepositTableBody').innerHTML = active.map(l => {
+                const baseRent = window.InfoCityDB.calcRent(l);
+                const cam = Number(l.sqft) * Number(l.camPerSqft || 14);
+                const taxable = baseRent + cam;
+                const gst18 = Math.round(taxable * 0.18);
+                const tds10 = Math.round(taxable * 0.10);
+                const netBank = taxable + gst18 - tds10;
+                const depMonths = Number(l.depositMonths || 6);
+                const depositAmt = baseRent * depMonths;
+
+                if (l.stage === "Booked") {
+                    escrowSum += depositAmt;
+                    taxableSum += taxable;
+                    gstSum += gst18;
+                    tdsSum += tds10;
+                }
+
+                return `
+                    <tr>
+                        <td><strong>${l.company}</strong><br><span class="pill-tag">${l.stage}</span></td>
+                        <td><strong>₹${depositAmt.toLocaleString('en-IN')}</strong><br><span style="font-size:11px; color:#5b6777;">(${depMonths} Months IFRSD)</span></td>
+                        <td>Rent: ₹${baseRent.toLocaleString('en-IN')}<br>CAM: ₹${cam.toLocaleString('en-IN')}</td>
+                        <td style="color:#0f4c5c; font-weight:600;">+₹${gst18.toLocaleString('en-IN')}</td>
+                        <td style="color:#b91c1c; font-weight:600;">-₹${tds10.toLocaleString('en-IN')}</td>
+                        <td style="color:#15803d; font-weight:700;">₹${netBank.toLocaleString('en-IN')}</td>
+                        <td>
+                            <span class="pill-tag">${l.form26asStatus || 'Pending'}</span><br>
+                            <button class="btn-sm btn-success" style="margin-top:4px;" onclick="reconcile26AS(${l.id})">Verify 26AS</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('finEscrowTotal').innerText = `₹${escrowSum.toLocaleString('en-IN')}`;
+            document.getElementById('finTaxableTotal').innerText = `₹${taxableSum.toLocaleString('en-IN')}`;
+            document.getElementById('finGstTotal').innerText = `₹${gstSum.toLocaleString('en-IN')}`;
+            document.getElementById('finTdsTotal').innerText = `₹${tdsSum.toLocaleString('en-IN')}`;
+        }
+
+        function reconcile26AS(id) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].form26asStatus = "Reconciled in Form 26AS";
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        /* PILLAR 4: COMMERCIAL UTILITY METERS, FIT-OUT RULES & FIRE SAFETY */
+        function renderPillar4UtilitiesAndFire(leases, compliance) {
+            document.getElementById('utilityFitoutTableBody').innerHTML = leases.map(l => `
+                <tr>
+                    <td><strong>${l.company}</strong><br><span style="font-size:11.5px; color:#5b6777;">${l.towerUnit}</span></td>
+                    <td><code>${l.ebMeterNo || 'TNEB-HT-09-44100'}</code><br><span style="font-size:11px; color:#15803d;">Commercial HT Tariff</span></td>
+                    <td><input type="text" value="${l.ebHandoverReading || '10,000 kWh'}" onchange="updateUtility(${l.id}, 'ebHandoverReading', this.value)" style="width:120px; margin:0; padding:4px;"></td>
+                    <td><code>${l.waterMeterNo || 'CMWSSB-880'}</code> (${l.waterHandoverReading || '500 kL'})</td>
+                    <td>
+                        <span class="pill-tag">${l.fitoutCompliance || 'Warm-Shell Restoration Signed'}</span><br>
+                        <button class="btn-sm btn-info" style="margin-top:4px;" onclick="approveFitout(${l.id})">Certify Pillar & Restoration</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const fireItems = compliance.filter(c => c.category === "Fire & Safety Compliance");
+            document.getElementById('fireSafetyTableBody').innerHTML = fireItems.map(f => `
+                <tr>
+                    <td><strong>${f.item}</strong></td>
+                    <td><code>${f.referenceNo}</code></td>
+                    <td>${f.validityOrCycle}</td>
+                    <td>₹${Number(f.amountPaid).toLocaleString('en-IN')}</td>
+                    <td><span class="pill-tag" style="color:#15803d;">${f.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateUtility(id, field, val) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx][field] = val;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+        }
+
+        function approveFitout(id) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].fitoutCompliance = "Certified (Zero Pillar Change + Warm-Shell Exit Bond)";
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        /* PILLAR 5: PROPERTY TAX & BUILDING INSURANCE */
+        function renderPillar5PropTaxAndInsurance(leases, compliance) {
+            const taxInsItems = compliance.filter(c => c.category !== "Fire & Safety Compliance");
+            document.getElementById('propTaxInsuranceTableBody').innerHTML = taxInsItems.map(t => `
+                <tr>
+                    <td><span class="pill-tag">${t.category}</span></td>
+                    <td><strong>${t.item}</strong></td>
+                    <td><code>${t.referenceNo}</code></td>
+                    <td>${t.validityOrCycle}</td>
+                    <td style="font-weight:700;">₹${Number(t.amountPaid).toLocaleString('en-IN')}</td>
+                    <td style="color:#15803d; font-weight:700;">${t.status}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('tenantInsuranceTableBody').innerHTML = leases.filter(l => l.stage !== "Lost").map(l => `
+                <tr>
+                    <td><strong>${l.company}</strong></td>
+                    <td>${l.towerUnit}</td>
+                    <td><code>${l.tenantInsurance || 'Pending Policy'}</code></td>
+                    <td>
+                        <button class="btn-sm btn-success" onclick="verifyTenantIns(${l.id})">Mark Policy Verified</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function verifyTenantIns(id) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].tenantInsurance = `Active (Policy #BAJAJ-IT-${Math.floor(10000 + Math.random()*89999)})`;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderAllOwnerModules();
+        }
+
+        function logNewTaxOrPolicy() {
+            const item = prompt("Enter Tax Receipt or Insurance Policy Description:");
+            if (!item) return;
+            const amt = Number(prompt("Enter Amount Paid (₹):", "250000") || 0);
+            const compliance = JSON.parse(localStorage.getItem('infocity_compliance')) || [];
+            compliance.unshift({
+                id: Date.now(),
+                category: "Property Tax & Municipal Dues",
+                item,
+                referenceNo: `GCC-REC-${Date.now().toString().slice(-5)}`,
+                validityOrCycle: "FY 2026-27",
+                amountPaid: amt,
+                status: "Paid & Verified"
+            });
+            localStorage.setItem('infocity_compliance', JSON.stringify(compliance));
+            renderAllOwnerModules();
+        }
+
+        /* MODULE 6: STAFF RBAC & INDEXEDDB EXPLORER */
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('infocity_users')) || [];
+            document.getElementById('userTableBody').innerHTML = users.map(u => `
+                <tr>
+                    <td><strong>${u.name}</strong></td>
+                    <td><code>${u.username}</code></td>
+                    <td>${u.role}</td>
+                    <td><span class="pill-tag">${u.scope || 'STANDARD'}</span></td>
+                    <td style="color:#15803d; font-weight:700;">${u.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        let activeStore = "leases";
+        const STORE_TO_LS = { "leases": "infocity_leases", "building_compliance": "infocity_compliance", "users": "infocity_users" };
+
+        function selectStore(storeName) {
+            activeStore = storeName;
+            document.getElementById('storeTitle').innerText = `Active Store: ${storeName}`;
+            const req = window.indexedDB.open("GlobalInfoCity_DB", 2);
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const getReq = db.transaction([storeName], "readonly").objectStore(storeName).getAll();
+                getReq.onsuccess = () => {
+                    const rows = getReq.result || [];
+                    if (rows.length === 0) return;
+                    const cols = Object.keys(rows[0]).slice(0, 4);
+                    document.getElementById('idbHead').innerHTML = `<tr>${cols.map(c => `<th>${c}</th>`).join('')}<th>Inspect</th></tr>`;
+                    document.getElementById('idbBody').innerHTML = rows.map(r => `
+                        <tr>${cols.map(c => `<td>${String(r[c]).slice(0, 26)}</td>`).join('')}
+                        <td><button class="btn-sm btn-info" onclick='loadRow(${JSON.stringify(r)})'>Edit JSON</button></td></tr>
+                    `).join('');
+                    document.getElementById('idbEditor').value = JSON.stringify(rows[0], null, 2);
+                };
+            };
+        }
+
+        function loadRow(obj) {
+            document.getElementById('idbEditor').value = JSON.stringify(obj, null, 2);
+        }
+
+        function saveIDBRecord() {
+            const parsed = JSON.parse(document.getElementById('idbEditor').value);
+            const req = window.indexedDB.open("GlobalInfoCity_DB", 2);
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction([activeStore], "readwrite");
+                tx.objectStore(activeStore).put(parsed);
+                tx.oncomplete = () => {
+                    const getReq = db.transaction([activeStore], "readonly").objectStore(activeStore).getAll();
+                    getReq.onsuccess = () => {
+                        localStorage.setItem(STORE_TO_LS[activeStore], JSON.stringify(getReq.result));
+                        selectStore(activeStore);
+                        renderAllOwnerModules();
+                        alert("Saved to IndexedDB!");
+                    };
+                };
+            };
+        }
+
+        async function resetSeeds() {
+            localStorage.removeItem('infocity_users');
+            localStorage.removeItem('infocity_leases');
+            localStorage.removeItem('infocity_compliance');
+            await window.InfoCityDB.syncNow();
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        const activeOwnerView = activateOwnerView();
+        renderAllOwnerModules();
+        if (activeOwnerView === 'rbac') selectStore('leases');
+    </script>
+</body>
+</html>

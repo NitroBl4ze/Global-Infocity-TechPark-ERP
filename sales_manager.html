@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global InfoCity TechPark — Sales Manager Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="db.js"></script>
+    <script src="sidebar.js" defer></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand-title">
+            <div class="building-mark">
+                <span class="b-tower b-t1"></span>
+                <span class="b-tower b-t2"></span>
+                <span class="b-tower b-t3"></span>
+            </div>
+            <span>Global InfoCity TechPark</span>
+            <span class="brand-sub">Leasing Manager Hub (Quotation Approval • Booking • Lead Assignment)</span>
+        </div>
+        <div class="nav-right">
+            <span id="userDisplay"></span>
+            <span class="badge" id="roleBadge">Sales Manager</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+            <div class="sidebar-head">
+                <div class="sidebar-head-copy">
+                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
+                    <strong>Sales Manager Hub</strong>
+                    <small>Team & quotation governance</small>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
+            </div>
+            <nav class="sidebar-nav">
+        <section class="sidebar-group">
+            <div class="sidebar-label">Management Overview</div>
+            <a class="nav-item" data-view="quotations" href="sales_manager.html?view=quotations" title="Pipeline & Quotations"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-text">Pipeline & Quotations</span></a>
+            <a class="nav-item" data-view="statistics" href="sales_manager.html?view=statistics" title="Statistics"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-text">Statistics</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Team Operations</div>
+            <a class="nav-item" data-view="assign" href="sales_manager.html?view=assign" title="Lead Assignment"><span class="nav-icon" aria-hidden="true">⇄</span><span class="nav-text">Lead Assignment</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Finance Coordination</div>
+            <a class="nav-item" data-view="forecast" href="sales_manager.html?view=forecast" title="Finance Forecast"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance Forecast</span></a>
+        </section>
+                <section class="sidebar-group admin-only hidden" id="ownerNavGroup">
+                    <div class="sidebar-label">Sales Department</div>
+                    <a class="nav-item" href="superadmin.html?view=pipeline" title="Super Admin"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Super Admin</span></a>
+                    <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Sales</span></a>
+                    <a class="nav-item" href="sales_manager.html?view=quotations" title="Sales Manager"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-text">Sales Manager</span></a>
+                    <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a>
+                </section>
+            </nav>
+
+
+        </aside>
+
+        <div class="main-content">
+            <header class="page-heading">
+                <div>
+                    <span class="page-eyebrow">SALES MANAGEMENT</span>
+                    <h1 id="managerPageTitle">Pipeline & Quotations</h1>
+                    <p id="managerPageDescription">Review incoming opportunities, approve commercial terms and move qualified tenants to booking.</p>
+                </div>
+                <span class="page-heading-tag" id="managerPageTag">Commercial governance</span>
+            </header>
+            <div class="crm-notice" id="managerContextBanner">
+                <div><strong>Sales Manager Authority:</strong> You govern the <strong>Quotation</strong> stage. Generate official printable lease proposals, approve discounts, and convert deals to <strong>Booked</strong>.</div>
+                <span class="pill-tag">Active Reps: 3</span>
+            </div>
+
+            <div id="mod-statistics" class="mod-sec hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>Quotations Awaiting Sign-Off</h3>
+                        <div class="value" id="mgrPendingQuotes">0</div>
+                    </div>
+                    <div class="card green">
+                        <h3>Booked Monthly Lease Roll</h3>
+                        <div class="value" id="mgrBookedVal">₹0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Sq.Ft in Pipeline</h3>
+                        <div class="value" id="mgrTotalSqft">0 Sq.Ft</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Lost / Rejected Deals</h3>
+                        <div class="value" id="mgrLostCount">0</div>
+                    </div>
+                </div>
+
+                <!-- Bar & Pie Charts -->
+                <div class="charts-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h2>Leasing Rep Performance: Booked vs Active Pipeline (Bar Chart)</h2></div>
+                        <div class="chart-box"><canvas id="mgrRepBarChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Pipeline Deals by Stage</h2></div>
+                        <div class="chart-box"><canvas id="mgrStagePieChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Lead Sources</h2></div>
+                        <div class="chart-box"><canvas id="mgrSourceChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-quotations" class="mod-sec">
+                <div class="pipeline-board" id="mgrKanbanBoard"></div>
+                <!-- Quotation Approval & Booking Controller -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Quotation Stage Governance (Approve Discount, Print Proposal & Move to Booked)</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IT Company</th>
+                                <th>Lead Source</th>
+                                <th>Tower & Floor Unit</th>
+                                <th>Sales Rep</th>
+                                <th>Base Rate/Sq.Ft</th>
+                                <th>Discount % (Editable)</th>
+                                <th>Net Monthly Rent</th>
+                                <th>Quotation & Stage Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quotationTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODULE 2: LEAD ASSIGNMENT & REASSIGNMENT -->
+            <div id="mod-assign" class="mod-sec hidden">
+                <div class="panel">
+                    <div class="panel-header"><h2>Assign New Incoming IT Company Inquiry to Sales Rep</h2></div>
+                    <form id="mgrAssignForm" style="display:grid; grid-template-columns: 1.3fr 1.3fr 1fr 0.7fr 1fr auto; gap:10px;">
+                        <input type="text" id="mComp" placeholder="IT Company Name" required style="margin:0;">
+                        <select id="mUnit" style="margin:0;">
+                            <option value="Tower A - Floor 6 (22,000 sq.ft)|22000|86">Tower A - Floor 6 (22,000 sq.ft @ ₹86)</option>
+                            <option value="Tower B - Floor 8 (16,000 sq.ft)|16000|80">Tower B - Floor 8 (16,000 sq.ft @ ₹80)</option>
+                            <option value="Tower C - Floor 4 (12,000 sq.ft)|12000|76">Tower C - Floor 4 (12,000 sq.ft @ ₹76)</option>
+                        </select>
+                        <select id="mSource" required style="margin:0;">
+                            <option value="" disabled selected>Lead source</option>
+                            <option>WhatsApp</option>
+                            <option>Instagram</option>
+                            <option>Website</option>
+                            <option>Referral</option>
+                            <option>Direct</option>
+                        </select>
+                        <input type="number" id="mDisc" placeholder="Disc %" value="0" style="margin:0;">
+                        <select id="mRep" style="margin:0;">
+                            <option value="Karthik Raja">Karthik Raja</option>
+                            <option value="Sneha Nair">Sneha Nair</option>
+                            <option value="Vikram Seth">Vikram Seth</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="margin:0;">Assign Lead</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><h2>All Team Inquiries — Reassign Rep or Generate Lease Quote</h2></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IT Company</th>
+                                <th>Lead Source</th>
+                                <th>Unit</th>
+                                <th>Current Stage</th>
+                                <th>Net Monthly Rent</th>
+                                <th>Assigned Sales Rep</th>
+                                <th>Proposal PDF</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allTeamTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODULE 3: SUBMIT FORECAST TO FINANCE -->
+            <div id="mod-forecast" class="mod-sec hidden">
+                <div class="panel" style="max-width:640px;">
+                    <div class="panel-header"><h2>Transmit Commercial Lease Revenue Report to Finance</h2></div>
+                    <form id="financeReportForm">
+                        <input type="text" id="repTitle" placeholder="Report Title (e.g., Q4 Global InfoCity Booked Lease Roll)" required>
+                        <input type="number" id="repRevenue" placeholder="Projected Monthly Lease Revenue (₹)" required>
+                        <input type="number" id="repExpense" placeholder="Brokerage & Tenant Fit-Out Allowance (₹)" required>
+                        <textarea id="repNotes" rows="3" placeholder="Occupancy commentary for Finance..." required></textarea>
+                        <button type="submit" class="btn-primary">Send Report to Finance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE COMMERCIAL LEASE QUOTATION MODAL -->
+    <div id="quoteModalOverlay" class="doc-modal-overlay hidden">
+        <div class="doc-paper">
+            <div class="doc-top-actions">
+                <div>
+                    <strong style="color:#0f4c5c;">Commercial Lease Quotation Preview</strong>
+                    <span style="font-size:12px; color:#64748b; margin-left:8px;">(Ready for A4 Print / PDF Export)</span>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-sm btn-info" onclick="window.print()">Print / Save as PDF</button>
+                    <button class="btn-sm btn-success" id="modalApproveBookBtn">Approve & Move to Booked</button>
+                    <button class="btn-sm btn-danger" onclick="closeQuoteModal()">Close</button>
+                </div>
+            </div>
+
+            <div class="doc-header">
+                <div>
+                    <div class="doc-title-badge">Commercial Lease Proposal</div>
+                    <h2 style="font-size:21px; color:#18242c;">Global InfoCity TechPark Pvt. Ltd.</h2>
+                    <p style="font-size:12px; color:#475569; line-height:1.5;">
+                        No. 40, Rajiv Gandhi Salai (OMR), Perungudi, Chennai – 600096, Tamil Nadu<br>
+                        GSTIN: <code>33AABCG4829K1Z5</code> | Commercial Leasing Desk: +91 44 6678 9000
+                    </p>
+                </div>
+                <div style="text-align:right; font-size:12.5px; line-height:1.6;">
+                    <strong>Quotation Ref:</strong> <code id="qRefNo">GIC-QT-2026-1002</code><br>
+                    <strong>Issue Date:</strong> <span id="qIssueDate"></span><br>
+                    <strong>Proposal Validity:</strong> 15 Calendar Days<br>
+                    <strong>Stage Status:</strong> <span id="qStageBadge" class="pill-tag">Quotation</span>
+                </div>
+            </div>
+
+            <div class="doc-parties">
+                <div>
+                    <h4>Lessor (Property Owner)</h4>
+                    <strong>Global InfoCity TechPark — Asset Management</strong>
+                    <p style="font-size:12px; color:#475569; margin-top:3px;">
+                        Grade-A SEZ & Non-SEZ IT/ITeS Commercial Campus<br>
+                        Leasing Manager: <span id="qMgrName">Priya Darshini</span>
+                    </p>
+                </div>
+                <div>
+                    <h4>Prospective Lessee (IT Tenant)</h4>
+                    <strong id="qTenantCompany" style="font-size:14px; color:#0f4c5c;">Freshworks AI Labs</strong>
+                    <p style="font-size:12px; color:#475569; margin-top:3px;">
+                        Allocated Unit: <strong id="qTowerUnit">Tower B - Floor 7</strong><br>
+                        Leasing Executive: <span id="qRepName">Karthik Raja</span>
+                    </p>
+                </div>
+            </div>
+
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Commercial Space & Tariff Description</th>
+                        <th>Super Built-Up Area</th>
+                        <th>Rate / Sq.Ft</th>
+                        <th>Monthly Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <strong>Base Warm-Shell Commercial Office Rent</strong><br>
+                            <span style="font-size:11.5px; color:#64748b;">Includes 100% DG backup, central chiller HVAC tap-off & base fire safety</span>
+                        </td>
+                        <td id="qSqftCell">15,000 Sq.Ft</td>
+                        <td id="qBaseRateCell">₹82.00</td>
+                        <td id="qGrossRentCell">₹12,30,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            <strong>Special Manager Leasing Discount</strong><br>
+                            <span style="font-size:11.5px; color:#15803d;" id="qNotesCell">Corporate multi-year expansion rebate</span>
+                        </td>
+                        <td>—</td>
+                        <td id="qDiscPctCell" style="color:#15803d; font-weight:700;">-8%</td>
+                        <td id="qDiscAmtCell" style="color:#15803d; font-weight:700;">-₹98,400</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>
+                            <strong>Common Area Maintenance (CAM Charges)</strong><br>
+                            <span style="font-size:11.5px; color:#64748b;">24x7 campus security, common lobby, elevators & landscaping @ ₹14/Sq.Ft</span>
+                        </td>
+                        <td id="qCamSqftCell">15,000 Sq.Ft</td>
+                        <td>₹14.00</td>
+                        <td id="qCamAmtCell">₹2,10,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="doc-summary-box">
+                <div class="doc-summary-row">
+                    <span>Net Monthly Base Rent:</span>
+                    <strong id="qSumNetRent">₹11,31,600</strong>
+                </div>
+                <div class="doc-summary-row">
+                    <span>Monthly CAM Charges:</span>
+                    <strong id="qSumCam">₹2,10,000</strong>
+                </div>
+                <div class="doc-summary-row">
+                    <span>Taxable Monthly Outflow:</span>
+                    <strong id="qSumTaxable">₹13,41,600</strong>
+                </div>
+                <div class="doc-summary-row">
+                    <span>Applicable GST (18%):</span>
+                    <strong id="qSumGst">₹2,41,488</strong>
+                </div>
+                <div class="doc-summary-row total">
+                    <span>Total Monthly Lease Outflow:</span>
+                    <span id="qSumGrandTotal">₹15,83,088</span>
+                </div>
+            </div>
+
+            <div style="margin-top:18px; padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; font-size:12px; line-height:1.6;">
+                <strong>Commercial Terms & Lock-In Conditions:</strong><br>
+                1. <strong>Interest-Free Refundable Security Deposit (IFRSD):</strong> <span id="qDepositVal" style="font-weight:700; color:#18242c;">₹67,89,600</span> (Equivalent to 6 months Net Base Rent).<br>
+                2. <strong>Lease Tenure & Lock-In:</strong> 5-Year Lease Term with a mandatory 36-Month Lock-in Period; 15% rent escalation every 3 years.<br>
+                3. <strong>Rent-Free Fit-Out Period:</strong> 45 Days from handover date for interior modular workstation setup.
+            </div>
+
+            <div class="doc-footer">
+                <div>
+                    <strong>Accepted by Prospective Lessee:</strong><br><br><br>
+                    _____________________________________<br>
+                    Authorized Signatory & Company Seal
+                </div>
+                <div style="text-align:right;">
+                    <strong>For Global InfoCity TechPark Pvt. Ltd.</strong><br><br><br>
+                    _____________________________________<br>
+                    Leasing Sales Manager (Authorized Sign-Off)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="detail-drawer hidden" id="managerLeaseDetailDrawer" aria-labelledby="managerLeaseDetailTitle" aria-modal="true" role="dialog">
+        <div class="detail-drawer-header">
+            <div><span class="drawer-eyebrow">Opportunity details</span><h2 id="managerLeaseDetailTitle">Company details</h2></div>
+            <button type="button" class="drawer-close" onclick="closeManagerLeaseDetails()" aria-label="Close details">×</button>
+        </div>
+        <div id="managerLeaseDetailContent" class="detail-drawer-content"></div>
+    </aside>
+    <div id="managerDrawerBackdrop" class="drawer-backdrop hidden" onclick="closeManagerLeaseDetails()"></div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || !['Sales Manager', 'SuperAdmin'].includes(currentUser.role)) window.location.href = 'index.html';
+        document.getElementById('userDisplay').innerText = currentUser.name;
+        if (currentUser.role === 'SuperAdmin') document.getElementById('ownerNavGroup')?.classList.remove('hidden');
+        if (currentUser.role === 'SuperAdmin') document.getElementById('roleBadge').innerText = 'Super Admin · Sales Manager';
+
+        const STAGES = ["Leads", "Call", "Follow Up", "Quotation", "Booked", "Lost"];
+        let mgrBar = null, mgrPie = null, mgrSource = null;
+
+        const MANAGER_VIEW_META = {
+            quotations: { title: 'Pipeline & Quotations', description: 'Review each active opportunity, inspect its source and approve or decline quotation requests.', tag: 'Pipeline governance' },
+            statistics: { title: 'Sales Management Statistics', description: 'Track team performance, booked value, active floor area and lead acquisition sources.', tag: 'Team performance' },
+            assign: { title: 'Lead Assignment', description: 'Assign incoming company inquiries to the right sales representative and monitor ownership.', tag: 'Team operations' },
+            forecast: { title: 'Finance Forecast', description: 'Submit revenue and cost forecasts to the Finance team with supporting commentary.', tag: 'Finance coordination' }
+        };
+
+        function activateManagerView() {
+            const requested = new URLSearchParams(window.location.search).get('view') || 'quotations';
+            const view = MANAGER_VIEW_META[requested] ? requested : 'quotations';
+            document.querySelectorAll('.mod-sec').forEach(section => section.classList.toggle('hidden', section.id !== `mod-${view}`));
+            document.querySelectorAll('.sidebar [data-view]').forEach(link => {
+                const active = link.dataset.view === view;
+                link.classList.toggle('active', active);
+                if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+            });
+            const meta = MANAGER_VIEW_META[view];
+            document.getElementById('managerPageTitle').textContent = meta.title;
+            document.getElementById('managerPageDescription').textContent = meta.description;
+            document.getElementById('managerPageTag').textContent = meta.tag;
+            document.title = `Global InfoCity TechPark — ${meta.title}`;
+            document.getElementById('managerContextBanner').classList.toggle('hidden', view !== 'quotations');
+            return view;
+        }
+
+        function switchMod(id) {
+            if (!MANAGER_VIEW_META[id]) return;
+            window.location.href = `sales_manager.html?view=${encodeURIComponent(id)}`;
+        }
+
+        function renderManagerPortal() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const quotes = leases.filter(l => l.stage === "Quotation");
+            const booked = leases.filter(l => l.stage === "Booked");
+            const lost = leases.filter(l => l.stage === "Lost");
+
+            const bookedVal = booked.reduce((s, l) => s + window.InfoCityDB.calcRent(l), 0);
+            const totalSqft = leases.filter(l => l.stage !== "Lost").reduce((s, l) => s + Number(l.sqft), 0);
+
+            document.getElementById('mgrPendingQuotes').innerText = quotes.length;
+            document.getElementById('mgrBookedVal').innerText = `₹${bookedVal.toLocaleString('en-IN')}`;
+            document.getElementById('mgrTotalSqft').innerText = `${totalSqft.toLocaleString('en-IN')} Sq.Ft`;
+            document.getElementById('mgrLostCount').innerText = lost.length;
+
+            // Render Pipeline Board
+            document.getElementById('mgrKanbanBoard').innerHTML = STAGES.map(stage => {
+                const items = leases.filter(l => l.stage === stage);
+                return `
+                    <div class="stage-col stage-${stage.replace(' ', '')}">
+                        <div class="stage-header"><span>${stage}</span><span class="pill-tag">${items.length}</span></div>
+                        ${items.map(i => `
+                            <div class="lease-card">
+                                <h4>${i.company}</h4>
+                                <div class="lease-meta">${i.towerUnit}<br>Lead source: <strong>${i.source || 'Not recorded'}</strong><br>Rep: <strong>${i.rep}</strong></div>
+                                <div class="lease-price">₹${window.InfoCityDB.calcRent(i).toLocaleString('en-IN')}/mo</div>
+                                <div class="pipeline-card-actions">
+                                    <button class="btn-sm btn-info" onclick="openManagerLeaseDetails(${i.id})">View details</button>
+                                    <button class="btn-sm btn-secondary" onclick="openQuoteModal(${i.id})">Preview quote</button>
+                                </div>
+                            </div>
+                        `).join('') || `<div style="font-size:11.5px; color:#94a3b8; text-align:center; margin-top:18px;">Empty</div>`}
+                    </div>
+                `;
+            }).join('');
+
+            // Render Quotation Control Table
+            const qBody = document.getElementById('quotationTableBody');
+            if (quotes.length === 0) {
+                qBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#64748b;">No inquiries currently in Quotation stage.</td></tr>`;
+            } else {
+                qBody.innerHTML = quotes.map(q => `
+                    <tr>
+                        <td><strong>${q.company}</strong></td>
+                        <td>${q.source || 'Not recorded'}</td>
+                        <td>${q.towerUnit}</td>
+                        <td>${q.rep}</td>
+                        <td>₹${q.ratePerSqft}/sq.ft</td>
+                        <td>
+                            <input type="number" value="${q.discountPct}" onchange="updateDiscount(${q.id}, this.value)" style="width:70px; margin:0; padding:4px;"> %
+                        </td>
+                        <td style="color:#0f4c5c; font-weight:700;">₹${window.InfoCityDB.calcRent(q).toLocaleString('en-IN')}/mo</td>
+                        <td>
+                            <button class="btn-sm btn-info" onclick="openQuoteModal(${q.id})">Preview / Print Quote</button>
+                            <button class="btn-sm btn-success" onclick="managerResolveQuote(${q.id}, 'Booked')">Approve & Book</button>
+                            <button class="btn-sm btn-danger" onclick="managerResolveQuote(${q.id}, 'Lost')">Lost</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Render All Team Assignment Table
+            document.getElementById('allTeamTable').innerHTML = leases.map(l => `
+                <tr>
+                    <td><strong>${l.company}</strong></td>
+                    <td>${l.source || 'Not recorded'}</td>
+                    <td>${l.towerUnit}</td>
+                    <td><span class="pill-tag">${l.stage}</span></td>
+                    <td>₹${window.InfoCityDB.calcRent(l).toLocaleString('en-IN')}/mo</td>
+                    <td>
+                        <select onchange="reassignRep(${l.id}, this.value)" style="margin:0; padding:5px;">
+                            <option value="Karthik Raja" ${l.rep==='Karthik Raja'?'selected':''}>Karthik Raja</option>
+                            <option value="Sneha Nair" ${l.rep==='Sneha Nair'?'selected':''}>Sneha Nair</option>
+                            <option value="Vikram Seth" ${l.rep==='Vikram Seth'?'selected':''}>Vikram Seth</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-sm btn-info" onclick="openQuoteModal(${l.id})">View / Print PDF</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            renderManagerCharts(leases);
+        }
+
+
+        function openManagerLeaseDetails(id) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const item = leases.find(lease => Number(lease.id) === Number(id));
+            if (!item) return;
+            document.getElementById('managerLeaseDetailTitle').textContent = item.company;
+            document.getElementById('managerLeaseDetailContent').innerHTML = `
+                <div class="detail-status">${item.stage}</div>
+                <dl class="detail-list">
+                    <div><dt>Lead source</dt><dd>${item.source || 'Not recorded'}</dd></div>
+                    <div><dt>Allocated tower / floor</dt><dd>${item.towerUnit || 'Not allocated'}</dd></div>
+                    <div><dt>Leased area</dt><dd>${Number(item.sqft || 0).toLocaleString('en-IN')} sq.ft</dd></div>
+                    <div><dt>Sales representative</dt><dd>${item.rep || 'Unassigned'}</dd></div>
+                    <div><dt>Base rate</dt><dd>₹${Number(item.ratePerSqft || 0).toLocaleString('en-IN')} / sq.ft</dd></div>
+                    <div><dt>Approved discount</dt><dd>${Number(item.discountPct || 0)}%</dd></div>
+                    <div><dt>Monthly rent</dt><dd>₹${window.InfoCityDB.calcRent(item).toLocaleString('en-IN')}</dd></div>
+                    <div><dt>Quotation status</dt><dd>${item.quoteStatus || 'Not requested'}</dd></div>
+                    <div><dt>Notes</dt><dd>${item.notes || 'No notes recorded'}</dd></div>
+                </dl>
+                <div class="drawer-actions"><button class="btn-sm btn-info" onclick="closeManagerLeaseDetails(); openQuoteModal(${item.id})">Preview quotation</button>
+                ${item.stage === 'Quotation' ? `<button class="btn-sm btn-success" onclick="closeManagerLeaseDetails(); managerResolveQuote(${item.id}, 'Booked')">Approve & book</button>` : ''}</div>
+            `;
+            document.getElementById('managerLeaseDetailDrawer').classList.remove('hidden');
+            document.getElementById('managerDrawerBackdrop').classList.remove('hidden');
+        }
+
+        function closeManagerLeaseDetails() {
+            document.getElementById('managerLeaseDetailDrawer').classList.add('hidden');
+            document.getElementById('managerDrawerBackdrop').classList.add('hidden');
+        }
+
+        function openQuoteModal(leaseId) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const item = leases.find(l => l.id === leaseId);
+            if (!item) return;
+
+            const sqft = Number(item.sqft);
+            const rate = Number(item.ratePerSqft);
+            const discPct = Number(item.discountPct || 0);
+            const grossRent = sqft * rate;
+            const discAmt = Math.round(grossRent * (discPct / 100));
+            const netRent = grossRent - discAmt;
+            const camAmt = sqft * 14;
+            const taxable = netRent + camAmt;
+            const gst = Math.round(taxable * 0.18);
+            const grandTotal = taxable + gst;
+
+            document.getElementById('qRefNo').innerText = `GIC-QT-2026-${item.id}`;
+            document.getElementById('qIssueDate').innerText = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('qStageBadge').innerText = item.stage;
+            document.getElementById('qMgrName').innerText = currentUser.name;
+            document.getElementById('qTenantCompany').innerText = item.company;
+            document.getElementById('qTowerUnit').innerText = item.towerUnit;
+            document.getElementById('qRepName').innerText = item.rep;
+
+            document.getElementById('qSqftCell').innerText = `${sqft.toLocaleString('en-IN')} Sq.Ft`;
+            document.getElementById('qBaseRateCell').innerText = `₹${rate.toFixed(2)}`;
+            document.getElementById('qGrossRentCell').innerText = `₹${grossRent.toLocaleString('en-IN')}`;
+            document.getElementById('qNotesCell').innerText = item.notes || "Special corporate leasing rate";
+            document.getElementById('qDiscPctCell').innerText = `-${discPct}%`;
+            document.getElementById('qDiscAmtCell').innerText = `-₹${discAmt.toLocaleString('en-IN')}`;
+            document.getElementById('qCamSqftCell').innerText = `${sqft.toLocaleString('en-IN')} Sq.Ft`;
+            document.getElementById('qCamAmtCell').innerText = `₹${camAmt.toLocaleString('en-IN')}`;
+
+            document.getElementById('qSumNetRent').innerText = `₹${netRent.toLocaleString('en-IN')}`;
+            document.getElementById('qSumCam').innerText = `₹${camAmt.toLocaleString('en-IN')}`;
+            document.getElementById('qSumTaxable').innerText = `₹${taxable.toLocaleString('en-IN')}`;
+            document.getElementById('qSumGst').innerText = `₹${gst.toLocaleString('en-IN')}`;
+            document.getElementById('qSumGrandTotal').innerText = `₹${grandTotal.toLocaleString('en-IN')}`;
+            document.getElementById('qDepositVal').innerText = `₹${(netRent * 6).toLocaleString('en-IN')}`;
+
+            const approveBtn = document.getElementById('modalApproveBookBtn');
+            if (item.stage === 'Booked') {
+                approveBtn.style.display = 'none';
+            } else {
+                approveBtn.style.display = 'inline-block';
+                approveBtn.onclick = function() {
+                    managerResolveQuote(item.id, 'Booked');
+                    closeQuoteModal();
+                };
+            }
+
+            document.getElementById('quoteModalOverlay').classList.remove('hidden');
+        }
+
+        function closeQuoteModal() {
+            document.getElementById('quoteModalOverlay').classList.add('hidden');
+        }
+
+        function updateDiscount(id, newDisc) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].discountPct = Number(newDisc);
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderManagerPortal();
+        }
+
+        function managerResolveQuote(id, targetStage) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].stage = targetStage;
+            leases[idx].quoteStatus = targetStage === "Booked" ? "Approved & Booked" : targetStage;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderManagerPortal();
+            alert(`Quotation for '${leases[idx].company}' moved to ${targetStage}!`);
+        }
+
+        function reassignRep(id, newRep) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases'));
+            const idx = leases.findIndex(l => l.id === id);
+            leases[idx].rep = newRep;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderManagerPortal();
+            alert(`Assigned '${leases[idx].company}' to ${newRep}!`);
+        }
+
+        document.getElementById('mgrAssignForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const [towerUnit, sqft, rate] = document.getElementById('mUnit').value.split('|');
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            leases.unshift({
+                id: Date.now(),
+                company: document.getElementById('mComp').value.trim(),
+                source: document.getElementById('mSource').value,
+                towerUnit,
+                sqft: Number(sqft),
+                ratePerSqft: Number(rate),
+                discountPct: Number(document.getElementById('mDisc').value),
+                stage: "Leads",
+                rep: document.getElementById('mRep').value,
+                quoteStatus: "Assigned by Manager",
+                invoiceStatus: "Pending",
+                fitoutCost: Math.round(Number(sqft) * 30),
+                notes: "Assigned by Sales Manager for immediate call outreach."
+            });
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderManagerPortal();
+            alert("Lead assigned to Sales Rep!");
+            this.reset();
+        });
+
+        function renderManagerCharts(leases) {
+            const reps = ["Karthik Raja", "Sneha Nair", "Vikram Seth"];
+            const bookedByRep = reps.map(r => leases.filter(l => l.rep === r && l.stage === "Booked").reduce((s, l) => s + window.InfoCityDB.calcRent(l), 0));
+            const activeByRep = reps.map(r => leases.filter(l => l.rep === r && !["Booked", "Lost"].includes(l.stage)).reduce((s, l) => s + window.InfoCityDB.calcRent(l), 0));
+
+            const bCtx = document.getElementById('mgrRepBarChart').getContext('2d');
+            if (mgrBar) mgrBar.destroy();
+            mgrBar = new Chart(bCtx, {
+                type: 'bar',
+                data: {
+                    labels: reps,
+                    datasets: [
+                        { label: 'Booked Rent (₹/mo)', data: bookedByRep, backgroundColor: '#15803d', borderRadius: 4 },
+                        { label: 'Active Pipeline Rent (₹/mo)', data: activeByRep, backgroundColor: '#0f4c5c', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const stageCounts = STAGES.map(s => leases.filter(l => l.stage === s).length);
+            const pCtx = document.getElementById('mgrStagePieChart').getContext('2d');
+            if (mgrPie) mgrPie.destroy();
+            mgrPie = new Chart(pCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: STAGES,
+                    datasets: [{
+                        data: stageCounts,
+                        backgroundColor: ['#64748b', '#0284c7', '#d97706', '#7c3aed', '#15803d', '#b91c1c']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const sourceTotals = {};
+            leases.forEach(lease => { const src = lease.source || 'Not recorded'; sourceTotals[src] = (sourceTotals[src] || 0) + 1; });
+            const sourceCanvas = document.getElementById('mgrSourceChart');
+            if (sourceCanvas) {
+                if (mgrSource) mgrSource.destroy();
+                mgrSource = new Chart(sourceCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: Object.keys(sourceTotals), datasets: [{ label: 'Leads', data: Object.values(sourceTotals), backgroundColor: '#0f4c5c', borderRadius: 7 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+        }
+
+        document.getElementById('financeReportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const reports = JSON.parse(localStorage.getItem('infocity_finance_reports')) || [];
+            reports.unshift({
+                id: Date.now(),
+                title: document.getElementById('repTitle').value,
+                revenue: Number(document.getElementById('repRevenue').value),
+                expense: Number(document.getElementById('repExpense').value),
+                notes: document.getElementById('repNotes').value,
+                submittedBy: currentUser.name,
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem('infocity_finance_reports', JSON.stringify(reports));
+            alert("Lease forecast transmitted to Finance!");
+            this.reset();
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        activateManagerView();
+        renderManagerPortal();
+    </script>
+</body>
+</html>

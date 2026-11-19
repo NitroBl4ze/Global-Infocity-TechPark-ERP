@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global InfoCity TechPark — Commercial Finance & P&L</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="db.js"></script>
+    <script src="sidebar.js" defer></script>
+
+<style>
+.invoice-actions { display:flex; flex-wrap:wrap; gap:6px; }
+@media (max-width: 720px) { .doc-top-actions { align-items:flex-start; flex-direction:column; gap:12px; } .doc-paper { padding:20px 16px; } .doc-parties { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand-title">
+            <div class="building-mark">
+                <span class="b-tower b-t1"></span>
+                <span class="b-tower b-t2"></span>
+                <span class="b-tower b-t3"></span>
+            </div>
+            <span>Global InfoCity TechPark</span>
+            <span class="brand-sub">Commercial Lease Finance, Tenant Cost & P&L</span>
+        </div>
+        <div class="nav-right">
+            <span id="userDisplay"></span>
+            <span class="badge" id="roleBadge">Finance Analyst</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+            <div class="sidebar-head">
+                <div class="sidebar-head-copy">
+                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
+                    <strong>Finance Workspace</strong>
+                    <small>Revenue, invoicing & P&L</small>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
+            </div>
+            <nav class="sidebar-nav">
+        <section class="sidebar-group">
+            <div class="sidebar-label">Finance Workspace</div>
+            <a class="nav-item" data-view="pnl" href="finance.html?view=pnl" title="Booked Leases"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-text">Booked Leases</span></a>
+            <a class="nav-item" data-view="statistics" href="finance.html?view=statistics" title="Statistics"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-text">Statistics</span></a>
+            <a class="nav-item" data-view="reports" href="finance.html?view=reports" title="Sales Forecasts"><span class="nav-icon" aria-hidden="true">⌁</span><span class="nav-text">Sales Forecasts</span></a>
+        </section>
+                <section class="sidebar-group admin-only hidden" id="ownerNavGroup">
+                    <div class="sidebar-label">Sales Department</div>
+                    <a class="nav-item" href="superadmin.html?view=pipeline" title="Super Admin"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Super Admin</span></a>
+                    <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Sales</span></a>
+                    <a class="nav-item" href="sales_manager.html?view=quotations" title="Sales Manager"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-text">Sales Manager</span></a>
+                    <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a>
+                </section>
+            </nav>
+
+
+        </aside>
+
+        <div class="main-content">
+            <header class="page-heading">
+                <div><span class="page-eyebrow">FINANCE DEPARTMENT</span><h1 id="financePageTitle">Booked Leases</h1><p id="financePageDescription">Review tenant rent, costs, invoice status and downloadable tax invoices.</p></div>
+                <span class="page-heading-tag" id="financePageTag">Revenue operations</span>
+            </header>
+            <div class="crm-notice" id="financeContextBanner">
+                <div><strong>Finance Stage Responsibility:</strong> Issue monthly GST Tax Invoices (SAC 997212) for all <strong>Booked</strong> IT park tenants and track fit-out costs vs net profit.</div>
+                <span class="pill-tag">GST @ 18% (9% CGST + 9% SGST)</span>
+            </div>
+
+            <div id="mod-statistics" class="mod-sec hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>Booked Monthly Gross Rent</h3>
+                        <div class="value" id="finGrossRent">₹0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Tenant Fit-Out & CAM Cost</h3>
+                        <div class="value" id="finTotalCost">₹0</div>
+                    </div>
+                    <div class="card green">
+                        <h3>Net Monthly Park Profit</h3>
+                        <div class="value" id="finNetProfit">₹0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Booked IT Tenants</h3>
+                        <div class="value" id="finTenantCount">0</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Chart.js Graphs -->
+                <div class="charts-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h2>Tenant-Wise Monthly Rent vs Fit-Out/Ops Cost vs Net Profit</h2></div>
+                        <div class="chart-box"><canvas id="finBarChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>TechPark Revenue Split (Net Profit vs Cost vs GST)</h2></div>
+                        <div class="chart-box"><canvas id="finDoughnutChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-pnl" class="mod-sec">
+                <!-- Booked Tenants Cost & Invoicing Table -->
+                <div class="panel">
+                    <div class="panel-header"><h2>Booked IT Park Tenants — Unit Cost, Profit & Printable GST Tax Invoices</h2></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IT Tenant Company</th>
+                                <th>Tower & Floor Unit</th>
+                                <th>Monthly Net Rent</th>
+                                <th>Fit-Out & Maintenance Cost</th>
+                                <th>Net Profit / Margin</th>
+                                <th>Invoice Status & Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookedFinanceTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-reports" class="mod-sec hidden">
+                <div class="panel">
+                    <div class="panel-header"><h2>Lease Revenue Forecasts Submitted by Sales Manager</h2></div>
+                    <table>
+                        <thead><tr><th>Date</th><th>Forecast Title</th><th>Projected Rent</th><th>Estimated Cost</th><th>Commentary</th></tr></thead>
+                        <tbody id="mgrReportsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE GST TAX INVOICE MODAL -->
+    <div id="invoiceModalOverlay" class="doc-modal-overlay hidden">
+        <div class="doc-paper">
+            <div class="doc-top-actions">
+                <div>
+                    <strong style="color:#0f4c5c;">GST Tax Invoice Generator (Original for Recipient)</strong>
+                    <span style="font-size:12px; color:#64748b; margin-left:8px;">(A4 Print / Save as PDF)</span>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-sm btn-success" id="modalDownloadPdfBtn" onclick="downloadInvoicePDF(activeInvoiceId)">Download PDF</button>
+                    <button class="btn-sm btn-info" onclick="window.print()">Print</button>
+                    <button class="btn-sm btn-success" id="modalMarkInvoicedBtn">Mark Invoice Issued</button>
+                    <button class="btn-sm btn-danger" onclick="closeInvoiceModal()">Close</button>
+                </div>
+            </div>
+
+            <div class="doc-header">
+                <div>
+                    <div class="doc-title-badge" style="background:#0f4c5c;">Tax Invoice (SAC: 997212)</div>
+                    <h2 style="font-size:21px; color:#18242c;">Global InfoCity TechPark Pvt. Ltd.</h2>
+                    <p style="font-size:12px; color:#475569; line-height:1.5;">
+                        No. 40, Rajiv Gandhi Salai (OMR), Perungudi, Chennai – 600096, Tamil Nadu<br>
+                        <strong>Supplier GSTIN:</strong> <code>33AABCG4829K1Z5</code> | <strong>PAN:</strong> <code>AABCG4829K</code>
+                    </p>
+                </div>
+                <div style="text-align:right; font-size:12.5px; line-height:1.6;">
+                    <strong>Invoice No:</strong> <code id="invNo">INV-GIC-2026-1001</code><br>
+                    <strong>Invoice Date:</strong> <span id="invDate"></span><br>
+                    <strong>Place of Supply:</strong> Tamil Nadu (Code: 33)<br>
+                    <strong>Payment Status:</strong> <span id="invStatusBadge" class="pill-tag">Invoiced</span>
+                </div>
+            </div>
+
+            <div class="doc-parties">
+                <div>
+                    <h4>Billed To (Registered IT Park Lessee)</h4>
+                    <strong id="invTenantName" style="font-size:14px; color:#0f4c5c;">Zoho Enterprise Systems</strong>
+                    <p style="font-size:12px; color:#475569; margin-top:3px;">
+                        Premises: <strong id="invUnitName">Tower A - Floor 4 (20,000 sq.ft)</strong><br>
+                        Global InfoCity Campus, OMR, Chennai – 600096<br>
+                        GSTIN: <strong id="invTenantGstin">Not recorded</strong> &nbsp;|&nbsp; PAN: <strong id="invTenantPan">Not recorded</strong><br>
+                        CIN: <strong id="invTenantCin">Not recorded</strong>
+                    </p>
+                </div>
+                <div>
+                    <h4>Contract & Billing Summary</h4>
+                    <p style="font-size:12px; color:#475569; line-height:1.6;">
+                        <strong>Service Accounting Code (SAC):</strong> 997212 (Commercial IT Space Rental)<br>
+                        <strong>Approved Discount Applied:</strong> <span id="invDiscountNote">5% Corporate Rebate</span><br>
+                        <strong>Finance Officer:</strong> <span id="invFinOfficer">Arun Kumar</span>
+                    </p>
+                </div>
+            </div>
+
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Description of Commercial Leasing Service</th>
+                        <th>SAC Code</th>
+                        <th>Area (Sq.Ft)</th>
+                        <th>Taxable Value (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <strong>Monthly Commercial Office Space Lease Rent (Net of Discount)</strong><br>
+                            <span style="font-size:11.5px; color:#64748b;" id="invRateBreakdown">Base Rate ₹85/Sq.Ft less approved discount</span>
+                        </td>
+                        <td><code>997212</code></td>
+                        <td id="invSqft1">20,000</td>
+                        <td id="invNetRentVal">₹16,15,000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            <strong>Common Area Maintenance (CAM) & 24x7 Utility Backup Charges</strong><br>
+                            <span style="font-size:11.5px; color:#64748b;">Standard TechPark O&M Tariff @ <span id="invCamRate">₹14.00</span> / Sq.Ft</span>
+                        </td>
+                        <td><code>997222</code></td>
+                        <td id="invSqft2">20,000</td>
+                        <td id="invCamVal">₹2,80,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="doc-summary-box">
+                <div class="doc-summary-row">
+                    <span>Total Taxable Value:</span>
+                    <strong id="invTaxableTotal">₹18,95,000</strong>
+                </div>
+                <div class="doc-summary-row">
+                    <span>Add: Central GST (CGST @ 9%):</span>
+                    <strong id="invCgst">₹1,70,550</strong>
+                </div>
+                <div class="doc-summary-row">
+                    <span>Add: State GST (SGST @ 9%):</span>
+                    <strong id="invSgst">₹1,70,550</strong>
+                </div>
+                <div class="doc-summary-row total">
+                    <span>Grand Total Invoice Amount:</span>
+                    <span id="invGrandTotal">₹22,36,100</span>
+                </div>
+            </div>
+
+            <div style="margin-top:18px; padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; font-size:12px; line-height:1.6;">
+                <strong>NEFT / RTGS Remittance Instructions:</strong><br>
+                Beneficiary Name: <strong>Global InfoCity TechPark Escrow A/C</strong> | Bank: <strong>HDFC Bank Ltd, Perungudi OMR Branch, Chennai</strong><br>
+                Current A/C No: <code>50200048291044</code> | IFSC Code: <code>HDFC0001842</code> | Due Date: Within 7 days of invoice generation.
+            </div>
+
+            <div class="doc-footer">
+                <div>
+                    <em>This is a system-generated GST Tax Invoice from Global InfoCity Finance Portal.</em>
+                </div>
+                <div style="text-align:right;">
+                    <strong>For Global InfoCity TechPark Pvt. Ltd.</strong><br><br><br>
+                    _____________________________________<br>
+                    Authorized Finance Signatory
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || !['Finance', 'SuperAdmin'].includes(currentUser.role)) window.location.href = 'index.html';
+        document.getElementById('userDisplay').innerText = currentUser.name;
+        if (currentUser.role === 'SuperAdmin') document.getElementById('ownerNavGroup')?.classList.remove('hidden');
+        if (currentUser.role === 'SuperAdmin') document.getElementById('roleBadge').innerText = 'Super Admin · Finance';
+
+        let finBar = null, finPie = null;
+        let activeInvoiceId = null;
+
+        const FINANCE_VIEW_META = {
+            pnl: { title: 'Booked Leases & Invoices', description: 'Review booked tenants, monthly rent, operating costs and company-specific tax invoices.', tag: 'Tenant billing' },
+            statistics: { title: 'Finance Statistics', description: 'Understand booked rental income, operating costs, margins and revenue mix.', tag: 'Financial performance' },
+            reports: { title: 'Sales Forecasts', description: 'Review forward-looking rent and cost forecasts submitted by the Sales Manager.', tag: 'Forecast review' }
+        };
+
+        function activateFinanceView() {
+            const requested = new URLSearchParams(window.location.search).get('view') || 'pnl';
+            const view = FINANCE_VIEW_META[requested] ? requested : 'pnl';
+            document.querySelectorAll('.mod-sec').forEach(section => section.classList.toggle('hidden', section.id !== `mod-${view}`));
+            document.querySelectorAll('.sidebar [data-view]').forEach(link => {
+                const active = link.dataset.view === view;
+                link.classList.toggle('active', active);
+                if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+            });
+            const meta = FINANCE_VIEW_META[view];
+            document.getElementById('financePageTitle').textContent = meta.title;
+            document.getElementById('financePageDescription').textContent = meta.description;
+            document.getElementById('financePageTag').textContent = meta.tag;
+            document.title = `Global InfoCity TechPark — ${meta.title}`;
+            document.getElementById('financeContextBanner').classList.toggle('hidden', view !== 'pnl');
+            return view;
+        }
+
+        function switchMod(id) {
+            if (!FINANCE_VIEW_META[id]) return;
+            window.location.href = `finance.html?view=${encodeURIComponent(id)}`;
+        }
+
+        function renderFinanceDashboard() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const booked = leases.filter(l => l.stage === "Booked");
+
+            let grossRent = 0, totalCost = 0;
+            booked.forEach(b => {
+                grossRent += window.InfoCityDB.calcRent(b);
+                totalCost += Number(b.fitoutCost || 450000);
+            });
+            const netProfit = grossRent - totalCost;
+
+            document.getElementById('finGrossRent').innerText = `₹${grossRent.toLocaleString('en-IN')}`;
+            document.getElementById('finTotalCost').innerText = `₹${totalCost.toLocaleString('en-IN')}`;
+            document.getElementById('finNetProfit').innerText = `${netProfit >= 0 ? '+' : ''}₹${netProfit.toLocaleString('en-IN')}`;
+            document.getElementById('finTenantCount').innerText = booked.length;
+
+            document.getElementById('bookedFinanceTable').innerHTML = booked.map(b => {
+                const rent = window.InfoCityDB.calcRent(b);
+                const cost = Number(b.fitoutCost || 450000);
+                const profit = rent - cost;
+                return `
+                    <tr>
+                        <td><strong>${escapeHTML(b.company || 'Unnamed tenant')}</strong></td>
+                        <td>${escapeHTML(b.towerUnit || 'Unit not assigned')}</td>
+                        <td style="color:#0f4c5c; font-weight:700;">₹${rent.toLocaleString('en-IN')}</td>
+                        <td style="color:#b91c1c;">₹${cost.toLocaleString('en-IN')}</td>
+                        <td style="color:${profit>=0?'#15803d':'#b91c1c'}; font-weight:700;">
+                            ${profit>=0?'+':''}₹${profit.toLocaleString('en-IN')}
+                        </td>
+                        <td>
+                            <span class="pill-tag" style="margin:0 6px 6px 0;">${escapeHTML(b.invoiceStatus || 'Pending')}</span><br>
+                            <div class="invoice-actions">
+                                <button class="btn-sm btn-info" onclick="openInvoiceModal(${Number(b.id)})">Preview</button>
+                                <button class="btn-sm btn-success" onclick="downloadInvoicePDF(${Number(b.id)})">Download PDF</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="6" style="text-align:center; color:#64748b;">No deals in 'Booked' stage yet. Approve a Quotation in Sales Manager portal first.</td></tr>`;
+
+            // Render Charts
+            const bCtx = document.getElementById('finBarChart').getContext('2d');
+            if (finBar) finBar.destroy();
+            finBar = new Chart(bCtx, {
+                type: 'bar',
+                data: {
+                    labels: booked.map(b => b.company),
+                    datasets: [
+                        { label: 'Monthly Rent (₹)', data: booked.map(b => window.InfoCityDB.calcRent(b)), backgroundColor: '#0f4c5c', borderRadius: 4 },
+                        { label: 'Fit-Out & Ops Cost (₹)', data: booked.map(b => Number(b.fitoutCost || 450000)), backgroundColor: '#b91c1c', borderRadius: 4 },
+                        { label: 'Net Profit (₹)', data: booked.map(b => window.InfoCityDB.calcRent(b) - Number(b.fitoutCost || 450000)), backgroundColor: '#15803d', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const pCtx = document.getElementById('finDoughnutChart').getContext('2d');
+            if (finPie) finPie.destroy();
+            finPie = new Chart(pCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Net Park Profit', 'Fit-Out & Maintenance Cost', '18% GST Provision'],
+                    datasets: [{
+                        data: [Math.max(0, netProfit), totalCost, Math.round(grossRent * 0.18)],
+                        backgroundColor: ['#15803d', '#b91c1c', '#d97706']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Load Manager Reports
+            const reports = JSON.parse(localStorage.getItem('infocity_finance_reports')) || [];
+            document.getElementById('mgrReportsBody').innerHTML = reports.map(r => `
+                <tr>
+                    <td>${r.date}</td>
+                    <td><strong>${r.title}</strong></td>
+                    <td style="color:#15803d; font-weight:700;">₹${Number(r.revenue).toLocaleString('en-IN')}</td>
+                    <td style="color:#b91c1c;">₹${Number(r.expense).toLocaleString('en-IN')}</td>
+                    <td>${r.notes} <em>(${r.submittedBy})</em></td>
+                </tr>
+            `).join('') || `<tr><td colspan="5" style="text-align:center; color:#64748b;">No Sales Manager reports submitted yet.</td></tr>`;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[char]);
+        }
+
+        function toLocalISODate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatInvoiceDate(value) {
+            const date = value ? new Date(`${value}T00:00:00`) : new Date();
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        }
+
+        function getInvoiceRecord(leaseId) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const index = leases.findIndex(lease => Number(lease.id) === Number(leaseId));
+            if (index < 0) return null;
+
+            const item = leases[index];
+            if (item.stage !== 'Booked') {
+                alert('Invoices can only be generated for booked tenants.');
+                return null;
+            }
+
+            // Keep the same invoice number and dates whenever this tenant's invoice is reopened.
+            const today = new Date();
+            const dateISO = toLocalISODate(today);
+            const invoiceDate = item.invoiceDate || dateISO;
+            const baseDate = new Date(`${invoiceDate}T00:00:00`);
+            const dueDate = new Date(baseDate);
+            dueDate.setDate(dueDate.getDate() + 7);
+
+            let changed = false;
+            if (!item.invoiceDate) {
+                item.invoiceDate = invoiceDate;
+                changed = true;
+            }
+            if (!item.invoiceNo) {
+                item.invoiceNo = `INV-GIC-${baseDate.getFullYear()}-${String(item.id).padStart(4, '0')}`;
+                changed = true;
+            }
+            if (!item.invoiceDueDate) {
+                item.invoiceDueDate = toLocalISODate(dueDate);
+                changed = true;
+            }
+            if (changed) {
+                leases[index] = item;
+                localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            }
+            return item;
+        }
+
+        function calculateInvoice(item) {
+            const sqft = Number(item.sqft || 0);
+            const netRent = window.InfoCityDB.calcRent(item);
+            const camRate = Number(item.camPerSqft ?? 14);
+            const camAmount = Math.round(sqft * camRate);
+            const taxable = netRent + camAmount;
+            const cgst = Math.round(taxable * 0.09);
+            const sgst = Math.round(taxable * 0.09);
+            const grandTotal = taxable + cgst + sgst;
+
+            return { sqft, netRent, camRate, camAmount, taxable, cgst, sgst, grandTotal };
+        }
+
+        function openInvoiceModal(leaseId) {
+            const item = getInvoiceRecord(leaseId);
+            if (!item) return;
+            const totals = calculateInvoice(item);
+            activeInvoiceId = item.id;
+
+            document.getElementById('invNo').innerText = item.invoiceNo;
+            document.getElementById('invDate').innerText = formatInvoiceDate(item.invoiceDate);
+            document.getElementById('invStatusBadge').innerText = item.invoiceStatus || 'Pending';
+            document.getElementById('invTenantName').innerText = item.company || 'Unnamed tenant';
+            document.getElementById('invUnitName').innerText = item.towerUnit || 'Unit not assigned';
+            document.getElementById('invTenantGstin').innerText = item.gstin || 'Not recorded';
+            document.getElementById('invTenantPan').innerText = item.companyPan || 'Not recorded';
+            document.getElementById('invTenantCin').innerText = item.cinNo || 'Not recorded';
+            document.getElementById('invDiscountNote').innerText = `${Number(item.discountPct || 0)}% Manager Approved Discount`;
+            document.getElementById('invFinOfficer').innerText = currentUser.name;
+
+            document.getElementById('invRateBreakdown').innerText =
+                `Base Rate INR ${Number(item.ratePerSqft || 0).toLocaleString('en-IN')}/Sq.Ft less ${Number(item.discountPct || 0)}% discount`;
+            document.getElementById('invSqft1').innerText = `${totals.sqft.toLocaleString('en-IN')} Sq.Ft`;
+            document.getElementById('invNetRentVal').innerText = `₹${totals.netRent.toLocaleString('en-IN')}`;
+            document.getElementById('invSqft2').innerText = `${totals.sqft.toLocaleString('en-IN')} Sq.Ft`;
+            document.getElementById('invCamRate').innerText = `₹${totals.camRate.toFixed(2)}`;
+            document.getElementById('invCamVal').innerText = `₹${totals.camAmount.toLocaleString('en-IN')}`;
+            document.getElementById('invTaxableTotal').innerText = `₹${totals.taxable.toLocaleString('en-IN')}`;
+            document.getElementById('invCgst').innerText = `₹${totals.cgst.toLocaleString('en-IN')}`;
+            document.getElementById('invSgst').innerText = `₹${totals.sgst.toLocaleString('en-IN')}`;
+            document.getElementById('invGrandTotal').innerText = `₹${totals.grandTotal.toLocaleString('en-IN')}`;
+
+            const markBtn = document.getElementById('modalMarkInvoicedBtn');
+            if ((item.invoiceStatus || '').toLowerCase() === 'invoiced') {
+                markBtn.style.display = 'none';
+            } else {
+                markBtn.style.display = 'inline-block';
+                markBtn.onclick = function () {
+                    issueInvoice(item.id);
+                    document.getElementById('invStatusBadge').innerText = 'Invoiced';
+                    markBtn.style.display = 'none';
+                };
+            }
+
+            document.getElementById('invoiceModalOverlay').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModalOverlay').classList.add('hidden');
+            activeInvoiceId = null;
+        }
+
+        function formatINR(value) {
+            return `INR ${Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+        }
+
+        function numberToIndianWords(number) {
+            const n = Math.round(Number(number) || 0);
+            if (n === 0) return 'Zero Rupees Only';
+
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            function belowThousand(value) {
+                let out = '';
+                if (value >= 100) {
+                    out += `${ones[Math.floor(value / 100)]} Hundred `;
+                    value %= 100;
+                }
+                if (value >= 20) {
+                    out += `${tens[Math.floor(value / 10)]} `;
+                    value %= 10;
+                }
+                if (value > 0) out += `${ones[value]} `;
+                return out.trim();
+            }
+
+            let remaining = n;
+            const parts = [];
+            const groups = [
+                { value: 10000000, label: 'Crore' },
+                { value: 100000, label: 'Lakh' },
+                { value: 1000, label: 'Thousand' },
+                { value: 1, label: '' }
+            ];
+            groups.forEach(group => {
+                const amount = Math.floor(remaining / group.value);
+                if (amount > 0) {
+                    parts.push(`${belowThousand(amount)}${group.label ? ` ${group.label}` : ''}`.trim());
+                    remaining %= group.value;
+                }
+            });
+            return `${parts.join(' ')} Rupees Only`;
+        }
+
+        function downloadInvoicePDF(leaseId) {
+            const item = getInvoiceRecord(leaseId);
+            if (!item) return;
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('The PDF component could not be loaded. Check your internet connection and refresh the page.');
+                return;
+            }
+
+            const totals = calculateInvoice(item);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 14;
+            const contentWidth = pageWidth - margin * 2;
+            const right = pageWidth - margin;
+            const dateLabel = formatInvoiceDate(item.invoiceDate);
+            const dueDateLabel = formatInvoiceDate(item.invoiceDueDate);
+            const invoiceNo = item.invoiceNo;
+            const company = item.company || 'Unnamed Tenant';
+            const money = formatINR;
+
+            doc.setProperties({
+                title: `Tax Invoice - ${company} - ${invoiceNo}`,
+                subject: 'Commercial leasing and CAM invoice',
+                author: 'Global InfoCity TechPark Finance Portal',
+                creator: 'Global InfoCity TechPark'
+            });
+
+            // Brand header.
+            doc.setFillColor(24, 36, 44);
+            doc.rect(0, 0, pageWidth, 34, 'F');
+            doc.setFillColor(56, 189, 248); doc.rect(margin, 10, 2.2, 10, 'F');
+            doc.setFillColor(251, 191, 36); doc.rect(margin + 3.2, 6, 2.2, 14, 'F');
+            doc.setFillColor(52, 211, 153); doc.rect(margin + 6.4, 8, 2.2, 12, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.text('GLOBAL INFOCITY TECHPARK', margin + 13, 12);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(213, 225, 234);
+            doc.text('Commercial Leasing & Asset Management', margin + 13, 18);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.setTextColor(255, 255, 255);
+            doc.text('TAX INVOICE', right, 12, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(213, 225, 234);
+            doc.text('ORIGINAL FOR RECIPIENT', right, 18, { align: 'right' });
+
+            // Supplier details and invoice metadata.
+            doc.setTextColor(30, 41, 59);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+            doc.text('SUPPLIER DETAILS', margin, 43);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+            doc.text('Global InfoCity TechPark Pvt. Ltd.', margin, 49);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2);
+            doc.text('No. 40, Rajiv Gandhi Salai (OMR), Perungudi, Chennai - 600096, Tamil Nadu', margin, 54);
+            doc.text('Supplier GSTIN: 33AABCG4829K1Z5    PAN: AABCG4829K', margin, 59);
+            doc.text('Place of Supply: Tamil Nadu (State Code 33)    SAC: 997212 / 997222', margin, 64);
+
+            const metaX = 132;
+            doc.setDrawColor(203, 213, 225);
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(metaX, 39, 64, 30, 2, 2, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(91, 103, 119);
+            doc.text('INVOICE NUMBER', metaX + 4, 45);
+            doc.setFontSize(9); doc.setTextColor(15, 76, 92);
+            doc.text(invoiceNo, metaX + 4, 50);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(91, 103, 119);
+            doc.text(`Invoice Date: ${dateLabel}`, metaX + 4, 57);
+            doc.text(`Due Date: ${dueDateLabel}`, metaX + 4, 63);
+
+            // Bill-to panel.
+            doc.setFillColor(241, 247, 249);
+            doc.setDrawColor(203, 213, 225);
+            doc.roundedRect(margin, 75, contentWidth, 39, 2, 2, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(91, 103, 119);
+            doc.text('BILLED TO', margin + 4, 82);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(15, 76, 92);
+            const companyLines = doc.splitTextToSize(company, 112);
+            doc.text(companyLines, margin + 4, 89);
+            let customerY = 89 + Math.max(0, companyLines.length - 1) * 4.5 + 5;
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(51, 65, 85);
+            doc.text(`Premises: ${item.towerUnit || 'Not recorded'}`, margin + 4, customerY);
+            doc.text(`GSTIN: ${item.gstin || 'Not recorded'}    PAN: ${item.companyPan || 'Not recorded'}`, margin + 4, customerY + 5);
+            doc.text(`CIN: ${item.cinNo || 'Not recorded'}`, margin + 4, customerY + 10);
+
+            // Lease and pricing summary.
+            const leaseY = 120;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(91, 103, 119);
+            doc.text('LEASE & BILLING DETAILS', margin, leaseY);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(margin, leaseY + 2, right, leaseY + 2);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2); doc.setTextColor(30, 41, 59);
+            const termText = item.tenureMonths ? `${item.tenureMonths} months` : 'Not recorded';
+            const lockText = item.lockInMonths ? `${item.lockInMonths} months` : 'Not recorded';
+            doc.text(`Area: ${totals.sqft.toLocaleString('en-IN')} Sq.Ft`, margin, leaseY + 9);
+            doc.text(`Base rate: ${money(item.ratePerSqft || 0)} / Sq.Ft`, 77, leaseY + 9);
+            doc.text(`Discount: ${Number(item.discountPct || 0)}%`, 145, leaseY + 9);
+            doc.text(`Lease term: ${termText}`, margin, leaseY + 16);
+            doc.text(`Lock-in: ${lockText}`, 77, leaseY + 16);
+            doc.text(`CAM rate: ${money(totals.camRate)} / Sq.Ft`, 145, leaseY + 16);
+
+            // Invoice line items table.
+            const tableX = margin;
+            let tableY = 145;
+            const colWidths = [9, 84, 20, 25, 44];
+            const headers = ['#', 'Description of Service', 'SAC', 'Area', 'Taxable Value'];
+            const rowHeights = [10, 20, 20];
+            let x = tableX;
+            doc.setFillColor(15, 76, 92);
+            doc.setDrawColor(203, 213, 225);
+            headers.forEach((header, i) => {
+                doc.rect(x, tableY, colWidths[i], rowHeights[0], 'FD');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(7.2); doc.setTextColor(255, 255, 255);
+                const lines = doc.splitTextToSize(header, colWidths[i] - 2);
+                doc.text(lines, x + colWidths[i] / 2, tableY + (lines.length > 1 ? 4 : 6), { align: 'center' });
+                x += colWidths[i];
+            });
+
+            const lineItems = [
+                {
+                    no: '1',
+                    description: `Monthly commercial office space lease rent (net of approved discount)\nBase rate ${money(item.ratePerSqft || 0)} / Sq.Ft | Discount ${Number(item.discountPct || 0)}%`,
+                    sac: '997212', area: totals.sqft.toLocaleString('en-IN'), amount: money(totals.netRent)
+                },
+                {
+                    no: '2',
+                    description: `Common area maintenance (CAM) and utility backup charges\nRate ${money(totals.camRate)} / Sq.Ft`,
+                    sac: '997222', area: totals.sqft.toLocaleString('en-IN'), amount: money(totals.camAmount)
+                }
+            ];
+            let currentY = tableY + rowHeights[0];
+            lineItems.forEach((row, rowIndex) => {
+                x = tableX;
+                const h = rowHeights[rowIndex + 1];
+                const cells = [row.no, row.description, row.sac, row.area, row.amount];
+                cells.forEach((value, i) => {
+                    doc.setFillColor(rowIndex % 2 === 0 ? 255 : 248, rowIndex % 2 === 0 ? 255 : 250, rowIndex % 2 === 0 ? 255 : 252);
+                    doc.rect(x, currentY, colWidths[i], h, 'FD');
+                    doc.setTextColor(30, 41, 59);
+                    doc.setFont('helvetica', i === 1 ? 'normal' : 'bold');
+                    doc.setFontSize(i === 1 ? 7.2 : 7.1);
+                    const inner = i === 1 ? 3 : 1.5;
+                    const lines = doc.splitTextToSize(String(value), colWidths[i] - inner * 2).slice(0, 3);
+                    if (i === 0 || i === 2 || i === 3) {
+                        doc.text(lines, x + colWidths[i] / 2, currentY + 5, { align: 'center' });
+                    } else if (i === 4) {
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(lines, x + colWidths[i] - 2, currentY + 12, { align: 'right' });
+                    } else {
+                        doc.text(lines, x + inner, currentY + 5);
+                    }
+                    x += colWidths[i];
+                });
+                currentY += h;
+            });
+
+            // Payment / totals panel.
+            const summaryY = 199;
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(203, 213, 225);
+            doc.roundedRect(margin, summaryY, 88, 43, 2, 2, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(15, 76, 92);
+            doc.text('PAYMENT INFORMATION', margin + 4, summaryY + 7);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(51, 65, 85);
+            doc.text('Payment terms: Due within 7 days', margin + 4, summaryY + 14);
+            doc.text(`Invoice status: ${item.invoiceStatus || 'Pending'}`, margin + 4, summaryY + 20);
+            doc.text('Bank: HDFC Bank Ltd, Perungudi OMR', margin + 4, summaryY + 26);
+            doc.text('A/C: 50200048291044 | IFSC: HDFC0001842', margin + 4, summaryY + 32);
+            doc.text('Beneficiary: Global InfoCity TechPark Escrow A/C', margin + 4, summaryY + 38);
+
+            const sumX = 108;
+            const sumW = 88;
+            const summaryRows = [
+                ['Taxable value', money(totals.taxable)],
+                ['CGST @ 9%', money(totals.cgst)],
+                ['SGST @ 9%', money(totals.sgst)]
+            ];
+            let sumY = summaryY;
+            summaryRows.forEach(([label, value]) => {
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(sumX, sumY, sumW, 8.5);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(51, 65, 85);
+                doc.text(label, sumX + 3, sumY + 5.5);
+                doc.setFont('helvetica', 'bold');
+                doc.text(value, sumX + sumW - 3, sumY + 5.5, { align: 'right' });
+                sumY += 8.5;
+            });
+            doc.setFillColor(24, 36, 44);
+            doc.rect(sumX, sumY, sumW, 17.5, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8); doc.text('TOTAL PAYABLE', sumX + 3, sumY + 6);
+            doc.setFontSize(11); doc.text(money(totals.grandTotal), sumX + sumW - 3, sumY + 13, { align: 'right' });
+
+            doc.setTextColor(51, 65, 85); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+            doc.text(`Amount in words: ${numberToIndianWords(totals.grandTotal)}`, margin, 250, {
+                maxWidth: contentWidth
+            });
+
+            // Demo safeguard and authorised signatory footer.
+            doc.setFillColor(255, 251, 235);
+            doc.setDrawColor(253, 230, 138);
+            doc.roundedRect(margin, 258, contentWidth, 15, 2, 2, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(7.2); doc.setTextColor(146, 64, 14);
+            doc.text('DEMO DOCUMENT', margin + 3, 264);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+            doc.text('Verify supplier/customer master data, tax applicability, SAC classification and statutory particulars before real-world issuance.', margin + 3, 269);
+
+            doc.setDrawColor(203, 213, 225);
+            doc.line(margin, 281, right, 281);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(100, 116, 139);
+            doc.text('System-generated invoice from Global InfoCity TechPark Finance Portal.', margin, 287);
+            doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 41, 59);
+            doc.text('For Global InfoCity TechPark Pvt. Ltd.', right, 287, { align: 'right' });
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setTextColor(100, 116, 139);
+            doc.text(`Generated by ${currentUser.name} | ${new Date().toLocaleString('en-IN')}`, margin, 292);
+
+            const safeCompany = company
+                .normalize('NFKD')
+                .replace(/[^a-zA-Z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 60) || 'Tenant';
+            doc.save(`GlobalInfoCity-Invoice-${safeCompany}-${invoiceNo}.pdf`);
+        }
+
+        function issueInvoice(id) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const idx = leases.findIndex(l => Number(l.id) === Number(id));
+            if (idx < 0) return;
+            leases[idx].invoiceStatus = 'Invoiced';
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderFinanceDashboard();
+            alert(`GST Tax Invoice marked as Issued for ${leases[idx].company}!`);
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        activateFinanceView();
+        renderFinanceDashboard();
+    </script>
+</body>
+</html>

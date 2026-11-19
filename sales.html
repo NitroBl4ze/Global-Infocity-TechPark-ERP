@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global InfoCity TechPark — Leasing Sales Executive</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="db.js"></script>
+    <script src="sidebar.js" defer></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand-title">
+            <div class="building-mark">
+                <span class="b-tower b-t1"></span>
+                <span class="b-tower b-t2"></span>
+                <span class="b-tower b-t3"></span>
+            </div>
+            <span>Global InfoCity TechPark</span>
+            <span class="brand-sub">Leasing Executive Desk (Leads • Call • Follow Up)</span>
+        </div>
+        <div class="nav-right">
+            <span id="userDisplay"></span>
+            <span class="badge" id="roleBadge">Sales Rep</span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+            <div class="sidebar-head">
+                <div class="sidebar-head-copy">
+                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
+                    <strong>Leasing Workspace</strong>
+                    <small>Lead generation & follow-up</small>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
+            </div>
+            <nav class="sidebar-nav">
+        <section class="sidebar-group">
+            <div class="sidebar-label">My Workspace</div>
+            <a class="nav-item" id="nav-board" data-view="board" href="sales.html?view=board" title="Pipeline"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-text">Pipeline</span></a>
+            <a class="nav-item" id="nav-statistics" data-view="statistics" href="sales.html?view=statistics" title="Statistics"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-text">Statistics</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Property Search</div>
+            <a class="nav-item" id="nav-floorplan" data-view="floorplan" href="sales.html?view=floorplan" title="Floor Availability"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Floor Availability</span></a>
+        </section>
+        <section class="sidebar-group">
+            <div class="sidebar-label">Lead Management</div>
+            <a class="nav-item" id="nav-newlead" data-view="newlead" href="sales.html?view=newlead" title="Add Lead"><span class="nav-icon" aria-hidden="true">+</span><span class="nav-text">Add Lead</span></a>
+        </section>
+                <section class="sidebar-group admin-only hidden" id="ownerNavGroup">
+                    <div class="sidebar-label">Sales Department</div>
+                    <a class="nav-item" href="superadmin.html?view=pipeline" title="Super Admin"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Super Admin</span></a>
+                    <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-text">Sales</span></a>
+                    <a class="nav-item" href="sales_manager.html?view=quotations" title="Sales Manager"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Sales Manager</span></a>
+                    <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a>
+                </section>
+            </nav>
+
+
+        </aside>
+
+        <div class="main-content">
+            <header class="page-heading">
+                <div>
+                    <span class="page-eyebrow">SALES DEPARTMENT</span>
+                    <h1 id="salesPageTitle">Leasing Pipeline</h1>
+                    <p id="salesPageDescription">Track every company inquiry from first contact through booking or loss.</p>
+                </div>
+                <span class="page-heading-tag" id="salesPageTag">Live leasing activity</span>
+            </header>
+            <div class="crm-notice" id="salesContextBanner">
+                <div><strong>Your Stage Authority:</strong> You control <strong>Leads</strong>, <strong>Call</strong>, and <strong>Follow Up</strong>. Use the <strong>Interactive Floor Plan Grid</strong> to pick vacant suites and pitch them to IT companies.</div>
+                <span class="pill-tag">Target: ₹25,00,000 Monthly Rent</span>
+            </div>
+
+            <div id="mod-statistics" class="mod-sec hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>My Monthly Rent Target</h3>
+                        <div class="value">₹25,00,000</div>
+                    </div>
+                    <div class="card green">
+                        <h3>My Booked Lease Rent</h3>
+                        <div class="value" id="myBookedRent">₹0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Active Leads / Calls / Follow-Ups</h3>
+                        <div class="value" id="myActiveCount">0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Awaiting Manager Quotation</h3>
+                        <div class="value" id="myQuoteWaiting">0</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h2>My Target vs Booked vs In-Pipeline Rent (Bar Chart)</h2></div>
+                        <div class="chart-box"><canvas id="repBarChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>My Inquiries by Pipeline Stage</h2></div>
+                        <div class="chart-box"><canvas id="repPieChart"></canvas></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Lead Sources</h2></div>
+                        <div class="chart-box"><canvas id="repSourceChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline with sales actions -->
+            <div id="mod-board" class="mod-sec">
+                <div class="panel pipeline-intro-panel">
+                    <div class="panel-header"><h2>Company opportunities</h2><span class="pill-tag">Select a company for its full record</span></div>
+                    <p class="subtitle">Use the detail panel to review lead source, allocated space, contact notes and available stage actions.</p>
+                </div>
+                <div class="pipeline-board" id="repKanbanBoard"></div>
+            </div>
+
+            <!-- MODULE 2: INTERACTIVE TOWER A, B, C FLOOR PLAN & AVAILABILITY GRID -->
+            <div id="mod-floorplan" class="mod-sec hidden">
+                <div class="cards-grid">
+                    <div class="card blue">
+                        <h3>Total Campus Suites</h3>
+                        <div class="value" id="fpTotalUnits">12</div>
+                    </div>
+                    <div class="card green">
+                        <h3>Vacant Suites (Ready to Pitch)</h3>
+                        <div class="value" id="fpVacantUnits">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>In Negotiation / Pipeline</h3>
+                        <div class="value" id="fpPipelineUnits">0</div>
+                    </div>
+                    <div class="card red">
+                        <h3>Booked / Occupied Suites</h3>
+                        <div class="value" id="fpBookedUnits">0</div>
+                    </div>
+                </div>
+
+                <div class="floorplan-legend">
+                    <strong>Visual Availability Legend:</strong>
+                    <div class="legend-item"><span class="legend-swatch swatch-vacant"></span> Vacant — Click to Pitch & Create Lead</div>
+                    <div class="legend-item"><span class="legend-swatch swatch-pipeline"></span> In Pipeline (Leads / Call / Follow Up / Quotation)</div>
+                    <div class="legend-item"><span class="legend-swatch swatch-booked"></span> Booked & Occupied by IT Tenant</div>
+                </div>
+
+                <div class="towers-grid" id="repTowersContainer"></div>
+            </div>
+
+            <!-- MODULE 3: ADD NEW IT COMPANY LEAD -->
+            <div id="mod-newlead" class="mod-sec hidden">
+                <div class="panel" style="max-width:640px;">
+                    <div class="panel-header">
+                        <h2>Register New IT Company Space Inquiry (Stage: Leads)</h2>
+                        <button class="btn-sm btn-info" onclick="switchMod('floorplan', document.getElementById('nav-floorplan'))">Pick from Floor Plan</button>
+                    </div>
+                    <form id="newLeaseForm">
+                        <label style="font-size:12px; color:#5b6777; font-weight:600;"> Prospective IT Company Name</label>
+                        <input type="text" id="lCompany" placeholder="e.g., Wipro Cloud Labs / TCS Digital" required>
+
+                        <label style="font-size:12px; color:#5b6777; font-weight:600;">Select Commercial Tower & Floor Unit</label>
+                        <select id="lUnit" required></select>
+
+                        <label style="font-size:12px; color:#5b6777; font-weight:600;">Lead Source</label>
+                        <select id="lSource" required>
+                            <option value="" disabled selected>Select source</option>
+                            <option>WhatsApp</option>
+                            <option>Instagram</option>
+                            <option>Website</option>
+                            <option>Referral</option>
+                            <option>Direct</option>
+                        </select>
+
+                        <label style="font-size:12px; color:#5b6777; font-weight:600;">Requested Tenant Discount % (0 for standard tariff)</label>
+                        <input type="number" id="lDiscount" placeholder="0" value="0" required>
+
+                        <label style="font-size:12px; color:#5b6777; font-weight:600;">Initial Discovery & Seating Notes</label>
+                        <textarea id="lNotes" rows="3" placeholder="Initial requirement, seating capacity & timeline notes..." required></textarea>
+
+                        <button type="submit" class="btn-primary">+ Create Inquiry in 'Leads' Stage</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="detail-drawer hidden" id="repLeaseDetailDrawer" aria-labelledby="repLeaseDetailTitle" aria-modal="true" role="dialog">
+        <div class="detail-drawer-header">
+            <div>
+                <span class="drawer-eyebrow">Pipeline record</span>
+                <h2 id="repLeaseDetailTitle">Company details</h2>
+            </div>
+            <button type="button" class="drawer-close" onclick="closeRepLeaseDetails()" aria-label="Close details">×</button>
+        </div>
+        <div id="repLeaseDetailContent" class="detail-drawer-content"></div>
+    </aside>
+    <div id="repDrawerBackdrop" class="drawer-backdrop hidden" onclick="closeRepLeaseDetails()"></div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || !['Sales', 'SuperAdmin'].includes(currentUser.role)) window.location.href = 'index.html';
+        document.getElementById('userDisplay').innerText = currentUser.name;
+        if (currentUser.role === 'SuperAdmin') document.getElementById('ownerNavGroup')?.classList.remove('hidden');
+        if (currentUser.role === 'SuperAdmin') document.getElementById('roleBadge').innerText = 'Super Admin · Sales';
+
+        const STAGES = ["Leads", "Call", "Follow Up", "Quotation", "Booked", "Lost"];
+        let repBar = null, repPie = null, repSource = null;
+
+        const SALES_VIEW_META = {
+            board: { title: 'Leasing Pipeline', description: 'Track company inquiries through Leads, Call, Follow Up, Quotation, Booked and Lost.', tag: 'Pipeline overview' },
+            statistics: { title: 'Sales Statistics', description: 'Monitor booked rent, active opportunities, conversion stages and lead acquisition sources.', tag: 'Performance insights' },
+            floorplan: { title: 'Floor Availability', description: 'Review allocations across Tower A, Tower B and Tower C, including vacant and occupied suites.', tag: 'Space allocation' },
+            newlead: { title: 'Add New Lead', description: 'Register a prospective tenant and capture how the company discovered Global InfoCity.', tag: 'Lead registration' }
+        };
+
+        function activateSalesView() {
+            const requested = new URLSearchParams(window.location.search).get('view') || 'board';
+            const view = SALES_VIEW_META[requested] ? requested : 'board';
+            document.querySelectorAll('.mod-sec').forEach(section => {
+                section.classList.toggle('hidden', section.id !== `mod-${view}`);
+            });
+            document.querySelectorAll('.sidebar [data-view]').forEach(link => {
+                const active = link.dataset.view === view;
+                link.classList.toggle('active', active);
+                if (active) link.setAttribute('aria-current', 'page');
+                else link.removeAttribute('aria-current');
+            });
+            const meta = SALES_VIEW_META[view];
+            document.getElementById('salesPageTitle').textContent = meta.title;
+            document.getElementById('salesPageDescription').textContent = meta.description;
+            document.getElementById('salesPageTag').textContent = meta.tag;
+            document.title = `Global InfoCity TechPark — ${meta.title}`;
+            document.getElementById('salesContextBanner').classList.toggle('hidden', view !== 'board');
+            return view;
+        }
+
+        function switchMod(id) {
+            if (!SALES_VIEW_META[id]) return;
+            window.location.href = `sales.html?view=${encodeURIComponent(id)}`;
+        }
+
+        // Master 12-Suite Architectural Catalog across Towers A, B, and C
+        const MASTER_SUITES = [
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 9 (30,000 sq.ft)", floor: "Floor 9", sqft: 30000, rate: 90 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 6 (22,000 sq.ft)", floor: "Floor 6", sqft: 22000, rate: 86 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 4 (20,000 sq.ft)", floor: "Floor 4", sqft: 20000, rate: 85 },
+            { tower: "Tower A (OMR Frontage)", unitLabel: "Tower A - Floor 2 (20,000 sq.ft)", floor: "Floor 2", sqft: 20000, rate: 85 },
+
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 8 (16,000 sq.ft)", floor: "Floor 8", sqft: 16000, rate: 80 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 7 (15,000 sq.ft)", floor: "Floor 7", sqft: 15000, rate: 82 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 5 (15,000 sq.ft)", floor: "Floor 5", sqft: 15000, rate: 82 },
+            { tower: "Tower B (SEZ IT Block)", unitLabel: "Tower B - Floor 3 (18,000 sq.ft)", floor: "Floor 3", sqft: 18000, rate: 80 },
+
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 5 (10,000 sq.ft)", floor: "Floor 5", sqft: 10000, rate: 75 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 4 (12,000 sq.ft)", floor: "Floor 4", sqft: 12000, rate: 76 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 3 (10,000 sq.ft)", floor: "Floor 3", sqft: 10000, rate: 75 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 2 (12,000 sq.ft)", floor: "Floor 2", sqft: 12000, rate: 78 },
+            { tower: "Tower C (Plug & Play Suites)", unitLabel: "Tower C - Floor 1 (8,000 sq.ft)", floor: "Floor 1", sqft: 8000, rate: 75 }
+        ];
+
+        function renderFloorPlanGrid() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const towers = ["Tower A (OMR Frontage)", "Tower B (SEZ IT Block)", "Tower C (Plug & Play Suites)"];
+
+            let vacantCount = 0, pipeCount = 0, bookedCount = 0;
+            const selectEl = document.getElementById('lUnit');
+            if (selectEl) selectEl.innerHTML = '';
+
+            const html = towers.map(towerName => {
+                const suites = MASTER_SUITES.filter(s => s.tower === towerName);
+                const cards = suites.map(suite => {
+                    // Check if an active (non-Lost) lease exists for this unit
+                    const activeLease = leases.find(l => l.towerUnit === suite.unitLabel && l.stage !== "Lost");
+                    let statusClass = "vacant";
+                    let badgeText = "VACANT";
+
+                    if (activeLease) {
+                        if (activeLease.stage === "Booked") {
+                            statusClass = "booked";
+                            badgeText = "BOOKED";
+                            bookedCount++;
+                        } else {
+                            statusClass = "pipeline";
+                            badgeText = `IN PIPELINE (${activeLease.stage})`;
+                            pipeCount++;
+                        }
+                    } else {
+                        vacantCount++;
+                    }
+
+                    // Populate dropdown in Add Lead form (mark status clearly)
+                    const optVal = `${suite.unitLabel}|${suite.sqft}|${suite.rate}`;
+                    if (selectEl) selectEl.innerHTML += `<option value="${optVal}">${suite.unitLabel} — ₹${suite.rate}/sq.ft [${badgeText}]</option>`;
+
+                    const monthlyBase = suite.sqft * suite.rate;
+
+                    return `
+                        <div class="suite-card ${statusClass}">
+                            <div class="suite-top">
+                                <span class="suite-title">${suite.floor} — ${suite.sqft.toLocaleString('en-IN')} Sq.Ft</span>
+                                <span class="status-pill ${statusClass}">${badgeText}</span>
+                            </div>
+                            <div class="suite-specs">
+                                <span>Tariff: <strong>₹${suite.rate}/Sq.Ft</strong></span>
+                                <span>Base Rent: <strong>₹${monthlyBase.toLocaleString('en-IN')}/mo</strong></span>
+                            </div>
+                            <div class="suite-tenant-box">
+                                ${activeLease ? `
+                                    <div>
+                                        <strong>${activeLease.company}</strong><br>
+                                        <span style="font-size:11px; color:#64748b;">Rep: ${activeLease.rep}</span>
+                                    </div>
+                                    <span class="pill-tag">${activeLease.stage}</span>
+                                ` : `
+                                    <span style="color:#15803d; font-weight:600;">Available for Immediate Lease</span>
+                                    <button class="btn-sm btn-success" onclick="pitchVacantSuite('${optVal}')">+ Select & Pitch</button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="tower-shell">
+                        <div class="tower-shell-header">
+                            <h3>${towerName}</h3>
+                            <span class="pill-tag">${suites.length} Floors</span>
+                        </div>
+                        ${cards}
+                    </div>
+                `;
+            }).join('');
+
+            const towersContainer = document.getElementById('repTowersContainer');
+            if (towersContainer) towersContainer.innerHTML = html;
+            const totalEl = document.getElementById('fpTotalUnits'); if (totalEl) totalEl.innerText = MASTER_SUITES.length;
+            const vacantEl = document.getElementById('fpVacantUnits'); if (vacantEl) vacantEl.innerText = vacantCount;
+            const pipelineEl = document.getElementById('fpPipelineUnits'); if (pipelineEl) pipelineEl.innerText = pipeCount;
+            const bookedEl = document.getElementById('fpBookedUnits'); if (bookedEl) bookedEl.innerText = bookedCount;
+        }
+
+        function pitchVacantSuite(optVal) {
+            sessionStorage.setItem('infocity_selected_suite', optVal);
+            switchMod('newlead');
+        }
+
+        function renderRepDashboard() {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const myLeases = currentUser.role === 'SuperAdmin'
+                ? leases
+                : leases.filter(l => l.rep === currentUser.name);
+
+            let bookedRent = 0, pipeRent = 0, activeEarly = 0, quoteWaiting = 0;
+            const stageCounts = { "Leads": 0, "Call": 0, "Follow Up": 0, "Quotation": 0, "Booked": 0, "Lost": 0 };
+            const sourceCounts = {};
+
+            myLeases.forEach(l => {
+                const rent = window.InfoCityDB.calcRent(l);
+                stageCounts[l.stage] = (stageCounts[l.stage] || 0) + 1;
+                const source = l.source || 'Not recorded';
+                sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+                if (l.stage === "Booked") bookedRent += rent;
+                else if (l.stage !== "Lost") pipeRent += rent;
+
+                if (["Leads", "Call", "Follow Up"].includes(l.stage)) activeEarly++;
+                if (l.stage === "Quotation") quoteWaiting++;
+            });
+
+            const bookedRentEl = document.getElementById('myBookedRent'); if (bookedRentEl) bookedRentEl.innerText = `₹${bookedRent.toLocaleString('en-IN')}`;
+            const activeEl = document.getElementById('myActiveCount'); if (activeEl) activeEl.innerText = activeEarly;
+            const quoteWaitingEl = document.getElementById('myQuoteWaiting'); if (quoteWaitingEl) quoteWaitingEl.innerText = quoteWaiting;
+
+            // Render Kanban Board
+            document.getElementById('repKanbanBoard').innerHTML = STAGES.map(stage => {
+                const items = myLeases.filter(l => l.stage === stage);
+                return `
+                    <div class="stage-col stage-${stage.replace(' ', '')}">
+                        <div class="stage-header"><span>${stage}</span><span class="pill-tag">${items.length}</span></div>
+                        ${items.map(i => `
+                            <div class="lease-card">
+                                <h4>${i.company}</h4>
+                                <div class="lease-meta">${i.towerUnit}</div>
+                                <span class="source-chip">Source · ${i.source || 'Not recorded'}</span>
+                                <div class="lease-price">₹${window.InfoCityDB.calcRent(i).toLocaleString('en-IN')}/mo</div>
+                                <button type="button" class="btn-sm btn-info" onclick="openRepLeaseDetails(${i.id})">View details</button>
+                            </div>
+                        `).join('') || `<div style="font-size:11.5px; color:#94a3b8; text-align:center; margin-top:18px;">Empty</div>`}
+                    </div>
+                `;
+            }).join('');
+
+            // Render Table with Sales Rep Stage Controls
+            const tableBody = document.getElementById('repTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = myLeases.map(l => `
+                    <tr>
+                        <td><strong>${l.company}</strong></td>
+                        <td>${l.source || 'Not recorded'}</td>
+                        <td>${l.towerUnit}</td>
+                        <td>${l.sqft.toLocaleString('en-IN')} sq.ft @ ₹${l.ratePerSqft} (-${l.discountPct}%)</td>
+                        <td><span class="pill-tag">${l.stage}</span></td>
+                        <td><button class="btn-sm btn-info" onclick="openRepLeaseDetails(${l.id})">View details & update</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            renderRepCharts(bookedRent, pipeRent, stageCounts, sourceCounts);
+            renderFloorPlanGrid();
+        }
+
+
+        function openRepLeaseDetails(id) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const lease = leases.find(item => Number(item.id) === Number(id));
+            if (!lease) return;
+            const canEditStage = !['Quotation', 'Booked'].includes(lease.stage);
+            document.getElementById('repLeaseDetailTitle').textContent = lease.company;
+            document.getElementById('repLeaseDetailContent').innerHTML = `
+                <div class="detail-status">${lease.stage}</div>
+                <dl class="detail-list">
+                    <div><dt>Lead source</dt><dd>${lease.source || 'Not recorded'}</dd></div>
+                    <div><dt>Allocated space</dt><dd>${lease.towerUnit || 'Not allocated'}</dd></div>
+                    <div><dt>Leased area</dt><dd>${Number(lease.sqft || 0).toLocaleString('en-IN')} sq.ft</dd></div>
+                    <div><dt>Base rate</dt><dd>₹${Number(lease.ratePerSqft || 0).toLocaleString('en-IN')} / sq.ft</dd></div>
+                    <div><dt>Discount</dt><dd>${Number(lease.discountPct || 0)}%</dd></div>
+                    <div><dt>Monthly rent</dt><dd>₹${window.InfoCityDB.calcRent(lease).toLocaleString('en-IN')}</dd></div>
+                    <div><dt>Assigned sales representative</dt><dd>${lease.rep || 'Unassigned'}</dd></div>
+                    <div><dt>Quotation status</dt><dd>${lease.quoteStatus || 'Not requested'}</dd></div>
+                </dl>
+                <label class="drawer-field-label" for="repDetailNotes">Call / follow-up notes</label>
+                <textarea id="repDetailNotes" rows="3">${lease.notes || ''}</textarea>
+                <button class="btn-primary drawer-save-btn" onclick="saveRepLeaseNotes(${lease.id})">Save notes</button>
+                ${canEditStage ? `
+                    <div class="drawer-actions">
+                        <h3>Move this lead</h3>
+                        <button class="btn-sm btn-info" onclick="repMoveStage(${lease.id}, 'Call')">Move to Call</button>
+                        <button class="btn-sm btn-warn" onclick="repMoveStage(${lease.id}, 'Follow Up')">Follow Up</button>
+                        <button class="btn-sm btn-success" onclick="repMoveStage(${lease.id}, 'Quotation')">Send to Quotation</button>
+                        <button class="btn-sm btn-danger" onclick="repMoveStage(${lease.id}, 'Lost')">Mark Lost</button>
+                    </div>` : `<p class="drawer-locked-note">This record is governed by the Sales Manager at the ${lease.stage} stage.</p>`}
+            `;
+            document.getElementById('repLeaseDetailDrawer').classList.remove('hidden');
+            document.getElementById('repDrawerBackdrop').classList.remove('hidden');
+        }
+
+        function closeRepLeaseDetails() {
+            document.getElementById('repLeaseDetailDrawer').classList.add('hidden');
+            document.getElementById('repDrawerBackdrop').classList.add('hidden');
+        }
+
+        function saveRepLeaseNotes(id) {
+            const leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const index = leases.findIndex(item => Number(item.id) === Number(id));
+            if (index < 0) return;
+            leases[index].notes = document.getElementById('repDetailNotes').value.trim();
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            openRepLeaseDetails(id);
+            renderRepDashboard();
+        }
+
+        function repMoveStage(id, nextStage) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const idx = leases.findIndex(l => l.id === id);
+            if (idx === -1) return;
+            leases[idx].stage = nextStage;
+            if (nextStage === "Quotation") {
+                leases[idx].quoteStatus = "Pending Manager Approval";
+                alert(`Moved '${leases[idx].company}' to Quotation stage! Routed to Sales Manager for rate approval.`);
+            }
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            closeRepLeaseDetails();
+            renderRepDashboard();
+        }
+
+        function updateNote(id, noteText) {
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            const idx = leases.findIndex(l => l.id === id);
+            if (idx === -1) return;
+            leases[idx].notes = noteText;
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+        }
+
+        document.getElementById('newLeaseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const [towerUnit, sqft, rate] = document.getElementById('lUnit').value.split('|');
+            let leases = JSON.parse(localStorage.getItem('infocity_leases')) || [];
+            leases.unshift({
+                id: Date.now(),
+                company: document.getElementById('lCompany').value.trim(),
+                source: document.getElementById('lSource').value,
+                towerUnit,
+                sqft: Number(sqft),
+                ratePerSqft: Number(rate),
+                discountPct: Number(document.getElementById('lDiscount').value),
+                stage: "Leads",
+                rep: currentUser.name,
+                quoteStatus: "Not Requested",
+                invoiceStatus: "Pending",
+                fitoutCost: Math.round(Number(sqft) * 30),
+                notes: document.getElementById('lNotes').value.trim()
+            });
+            localStorage.setItem('infocity_leases', JSON.stringify(leases));
+            renderRepDashboard();
+            alert(`New IT company inquiry created for ${towerUnit}!`);
+            this.reset();
+            switchMod('board', document.getElementById('nav-board'));
+        });
+
+        function renderRepCharts(bookedRent, pipeRent, stageCounts, sourceCounts = {}) {
+            const bCtx = document.getElementById('repBarChart').getContext('2d');
+            if (repBar) repBar.destroy();
+            repBar = new Chart(bCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Monthly Rent Target', 'Booked Rent Achieved', 'Active Pipeline Rent'],
+                    datasets: [{
+                        label: 'Monthly Rent (₹)',
+                        data: [2500000, bookedRent, pipeRent],
+                        backgroundColor: ['#0f4c5c', '#15803d', '#d97706'],
+                        borderRadius: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const pCtx = document.getElementById('repPieChart').getContext('2d');
+            if (repPie) repPie.destroy();
+            repPie = new Chart(pCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stageCounts),
+                    datasets: [{
+                        data: Object.values(stageCounts),
+                        backgroundColor: ['#64748b', '#0284c7', '#d97706', '#7c3aed', '#15803d', '#b91c1c']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const sourceCanvas = document.getElementById('repSourceChart');
+            if (sourceCanvas) {
+                if (repSource) repSource.destroy();
+                repSource = new Chart(sourceCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(sourceCounts),
+                        datasets: [{ label: 'Leads', data: Object.values(sourceCounts), backgroundColor: '#0f4c5c', borderRadius: 7 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        const activeSalesView = activateSalesView();
+        renderRepDashboard();
+        if (activeSalesView === 'newlead') {
+            const selectedSuite = sessionStorage.getItem('infocity_selected_suite');
+            const unitSelect = document.getElementById('lUnit');
+            if (selectedSuite && unitSelect) unitSelect.value = selectedSuite;
+            sessionStorage.removeItem('infocity_selected_suite');
+        }
+    </script>
+</body>
+</html>
