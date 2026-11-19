@@ -42,5 +42,40 @@
     }
   }
 
-  window.InfoCityEmail = { sendApproval: sendApproval };
+  async function sendReceipt(receipt) {
+    const params = {
+      to_email: receipt.email,
+      to_name: receipt.company,
+      receipt_no: receipt.receiptNo,
+      amount: 'INR ' + Number(receipt.amount || 0).toLocaleString('en-IN'),
+      payment_type: receipt.paymentType,
+      payment_date: receipt.date,
+      payment_method: receipt.method,
+      transaction_reference: receipt.reference,
+      message: 'A Global InfoCity TechPark payment receipt has been generated. The receipt reference and payment details are included in this email.'
+    };
+    if (!params.to_email) {
+      recordDelivery({ to: '', subject: 'Payment receipt ' + receipt.receiptNo, status: 'Not sent — organisation email missing', receiptNo: receipt.receiptNo });
+      return { sent: false, status: 'Not sent — organisation email missing' };
+    }
+    if (!CONFIG.serviceId || !CONFIG.templateId || !CONFIG.publicKey) {
+      recordDelivery({ to: params.to_email, subject: 'Payment receipt ' + receipt.receiptNo, status: 'Queued — email provider not configured', receiptNo: receipt.receiptNo });
+      return { sent: false, status: 'Queued — email provider not configured' };
+    }
+    try {
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ service_id: CONFIG.serviceId, template_id: CONFIG.templateId, user_id: CONFIG.publicKey, template_params: params })
+      });
+      if (!response.ok) throw new Error('Email provider returned ' + response.status);
+      recordDelivery({ to: params.to_email, subject: 'Payment receipt ' + receipt.receiptNo, status: 'Sent', receiptNo: receipt.receiptNo });
+      return { sent: true, status: 'Sent' };
+    } catch (error) {
+      recordDelivery({ to: params.to_email, subject: 'Payment receipt ' + receipt.receiptNo, status: 'Failed — ' + error.message, receiptNo: receipt.receiptNo });
+      return { sent: false, status: 'Failed — ' + error.message };
+    }
+  }
+
+  window.InfoCityEmail = { sendApproval: sendApproval, sendReceipt: sendReceipt };
 })();

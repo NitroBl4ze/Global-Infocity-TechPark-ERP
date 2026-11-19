@@ -1,10 +1,10 @@
 /**
  * Global InfoCity TechPark — Commercial Building Owner & Leasing IndexedDB Engine (db.js)
- * Database: GlobalInfoCity_DB (Version 2)
+ * Database: GlobalInfoCity_DB (Version 4)
  */
 
 const DB_NAME = "GlobalInfoCity_DB";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 const STORE_MAP = {
     "infocity_users": { store: "users", keyPath: "username" },
@@ -17,7 +17,18 @@ const STORE_MAP = {
     "infocity_marketing": { store: "marketing_records", keyPath: "id" },
     "infocity_facility_amenities": { store: "facility_amenities", keyPath: "id" },
     "infocity_hr_operations": { store: "hr_operations", keyPath: "id" },
-    "infocity_email_outbox": { store: "email_outbox", keyPath: "id" }
+    "infocity_email_outbox": { store: "email_outbox", keyPath: "id" },
+    "infocity_sales_activities": { store: "sales_activities", keyPath: "id" },
+    "infocity_sales_followups": { store: "sales_followups", keyPath: "id" },
+    "infocity_sales_replies": { store: "sales_replies", keyPath: "id" },
+    "infocity_sales_manager_payments": { store: "sales_manager_payments", keyPath: "id" },
+    "infocity_sales_payment_methods": { store: "sales_payment_methods", keyPath: "id" },
+    "infocity_sales_manager_loans": { store: "sales_manager_loans", keyPath: "id" },
+    "infocity_receipts": { store: "receipt_records", keyPath: "id" },
+    "infocity_marketing_channel_metrics": { store: "marketing_channel_metrics", keyPath: "id" },
+    "infocity_marketing_leads": { store: "marketing_leads", keyPath: "id" },
+    "infocity_marketing_calls": { store: "marketing_calls", keyPath: "id" },
+    "infocity_hr_employee_activities": { store: "hr_employee_activities", keyPath: "id" }
 };
 
 let dbInstance = null;
@@ -450,7 +461,7 @@ function renderIDBStatusBadge(connected) {
     `;
     pill.innerHTML = `
         <span style="width:8px; height:8px; border-radius:50%; background:${connected ? '#22c55e' : '#ef4444'}; display:inline-block;"></span>
-        <span>IndexedDB: ${connected ? 'GlobalInfoCity_DB v2 (LIVE)' : 'OFFLINE'}</span>
+        <span>IndexedDB: ${connected ? 'GlobalInfoCity_DB v4 (LIVE)' : 'OFFLINE'}</span>
     `;
     document.body.appendChild(pill);
 }
