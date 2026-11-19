@@ -1,149 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global InfoCity TechPark — Commercial Leasing Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="db.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123b48">
+  <title>Global InfoCity TechPark — Employee Access</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="portal-access.css">
+  <script src="db.js"></script>
+  <script src="portal-access.js" defer></script>
 </head>
-<body>
-    <div class="auth-container">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom: 16px;">
-            <div class="building-mark">
-                <span class="b-tower b-t1"></span>
-                <span class="b-tower b-t2"></span>
-                <span class="b-tower b-t3"></span>
-            </div>
-            <div>
-                <strong style="font-size:16.5px; color:#18242c; display:block;">Global InfoCity TechPark</strong>
-                <span style="font-size:11.5px; color:#5b6777;">Commercial IT Space Leasing & Asset Management</span>
-            </div>
+<body class="portal-login-page">
+  <main class="portal-shell">
+    <section class="portal-brand">
+      <div class="building-mark" aria-hidden="true"><span class="b-tower b-t1"></span><span class="b-tower b-t2"></span><span class="b-tower b-t3"></span></div>
+      <div>
+        <p class="portal-kicker">GLOBAL INFOCITY · DIGITAL WORKSPACE</p>
+        <h1>One campus. One connected workspace.</h1>
+        <p>Choose your department to sign in to the right operational portal.</p>
+      </div>
+    </section>
+
+    <section class="portal-card" aria-labelledby="portalTitle">
+      <div class="portal-card-heading">
+        <div>
+          <span class="portal-kicker">EMPLOYEE ACCESS</span>
+          <h2 id="portalTitle">Select your workspace</h2>
         </div>
+        <span class="portal-secure-pill">Role-based access</span>
+      </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('login')">Employee Sign In</button>
-            <button class="tab-btn" onclick="showTab('register')">Register Staff</button>
+      <div id="portalGrid" class="portal-grid" aria-label="Choose a department"></div>
+
+      <form id="portalLoginForm" class="portal-login-form hidden">
+        <div class="portal-login-title">
+          <button type="button" id="portalBackButton" class="portal-back">← All departments</button>
+          <div>
+            <span class="portal-kicker">SIGN IN TO</span>
+            <h3 id="selectedPortalName">Department</h3>
+          </div>
         </div>
+        <input type="hidden" id="selectedPortalRole" value="">
+        <label for="portalUsername">Work email or username</label>
+        <input id="portalUsername" name="username" type="text" autocomplete="username" placeholder="name@globalinfocity.com or username" required>
+        <label for="portalPassword">Password</label>
+        <input id="portalPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        <p id="portalLoginMessage" class="portal-message" role="status" aria-live="polite"></p>
+        <button type="submit" class="portal-submit">Sign in to workspace <span aria-hidden="true">→</span></button>
+      </form>
 
-        <!-- Login Form -->
-        <form id="loginForm" class="auth-form">
-            <h2>Leasing & Operations Portal</h2>
-            <p class="subtitle">Sign in to manage IT park commercial spaces & pipeline</p>
-            <input type="text" id="loginUser" placeholder="Username" required>
-            <input type="password" id="loginPass" placeholder="Password" required>
-            <button type="submit" class="btn-primary">Access Workspace</button>
-            <p id="loginError" class="error-msg"></p>
-            
-            <div class="demo-creds">
-                <strong>Global InfoCity Role Credentials (Pipeline Access):</strong><br>
-                • <strong>SuperAdmin</strong> (All 6 Stages): <code>admin_aditya</code> / <code>Super@123</code><br>
-                • <strong>Sales Rep</strong> (Leads, Call, Follow Up): <code>sales_karthik</code> / <code>Sales@123</code><br>
-                • <strong>Sales Manager</strong> (Quotation, Booked, Lost): <code>mgr_priya</code> / <code>Mgr@123</code><br>
-                • <strong>Finance</strong> (Booked Invoicing & P&L): <code>fin_arun</code> / <code>Fin@123</code><br>
-                • <strong>HR</strong> (TechPark Staff & Hiring): <code>hr_divya</code> / <code>Hr@123</code>
-            </div>
-        </form>
+      <div class="portal-register-strip">
+        <span>New to Global InfoCity?</span>
+        <a href="register.html">Register your details <span aria-hidden="true">↗</span></a>
+      </div>
 
-        <!-- Register Form -->
-        <form id="registerForm" class="auth-form hidden">
-            <h2>Register TechPark Staff</h2>
-            <p class="subtitle">Provision role-based access for Global InfoCity</p>
-            <input type="text" id="regName" placeholder="Full Name" required>
-            <input type="text" id="regUser" placeholder="Username" required>
-            <input type="password" id="regPass" placeholder="Password" required>
-            <select id="regRole" required>
-                <option value="" disabled selected>Select Department Role</option>
-                <option value="SuperAdmin">SuperAdmin (Full Park & Pipeline Control)</option>
-                <option value="Sales">Leasing Sales Executive (Leads, Call, Follow Up)</option>
-                <option value="Sales Manager">Leasing Sales Manager (Quotation & Booking Approval)</option>
-                <option value="Finance">Commercial Finance Analyst (Rent Invoicing & P&L)</option>
-                <option value="HR">HR & Facility Staffing</option>
-            </select>
-            <button type="submit" class="btn-primary">Create Staff Account</button>
-            <p id="regMsg" class="success-msg"></p>
-        </form>
-    </div>
-
-    <script>
-        function logAudit(actor, action, module, severity = "INFO") {
-            const logs = JSON.parse(localStorage.getItem('infocity_audit_logs')) || [];
-            logs.unshift({
-                id: Date.now(),
-                time: new Date().toLocaleString(),
-                actor,
-                action,
-                module,
-                severity
-            });
-            localStorage.setItem('infocity_audit_logs', JSON.stringify(logs));
-        }
-
-        function showTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (tab === 'login') {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('registerForm').classList.add('hidden');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            } else {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerForm').classList.remove('hidden');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const u = document.getElementById('loginUser').value.trim();
-            const p = document.getElementById('loginPass').value.trim();
-            const users = JSON.parse(localStorage.getItem('infocity_users')) || [];
-
-            const matchedUser = users.find(user => user.username === u && user.password === p);
-
-            if (!matchedUser) {
-                logAudit(u || "Unknown", "Failed login attempt", "Auth Gateway", "WARN");
-                document.getElementById('loginError').innerText = "Invalid username or password.";
-                return;
-            }
-            if (matchedUser.status === "Suspended") {
-                logAudit(u, "Blocked login (Suspended account)", "Auth Gateway", "CRITICAL");
-                document.getElementById('loginError').innerText = "Account suspended by SuperAdmin.";
-                return;
-            }
-
-            logAudit(matchedUser.username, `Signed into ${matchedUser.role} portal`, "Auth Gateway", "INFO");
-            localStorage.setItem('currentUser', JSON.stringify(matchedUser));
-
-            const routes = {
-                "SuperAdmin": "superadmin.html?view=pipeline",
-                "Sales": "sales.html?view=board",
-                "Sales Manager": "sales_manager.html?view=quotations",
-                "Finance": "finance.html?view=pnl",
-                "HR": "hr.html?view=hiring"
-            };
-            window.location.href = routes[matchedUser.role];
-        });
-
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('regName').value.trim();
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value.trim();
-            const role = document.getElementById('regRole').value;
-
-            let users = JSON.parse(localStorage.getItem('infocity_users')) || [];
-            if (users.some(u => u.username === username)) {
-                alert("Username already exists!");
-                return;
-            }
-
-            users.push({ name, username, password, role, status: "Active", scope: `${role.toUpperCase()}_DEFAULT` });
-            localStorage.setItem('infocity_users', JSON.stringify(users));
-            logAudit("Self-Registration", `Registered ${username} (${role})`, "Staff Directory", "INFO");
-            
-            document.getElementById('regMsg').innerText = "Staff registered! Switch to Sign In tab.";
-            this.reset();
-        });
-    </script>
+      <details class="portal-demo-details">
+        <summary>Demo account access</summary>
+        <div class="portal-demo-grid">
+          <span>Super Admin</span><code>admin_aditya / Super@123</code>
+          <span>Sales</span><code>sales_karthik / Sales@123</code>
+          <span>Sales Manager</span><code>mgr_priya / Mgr@123</code>
+          <span>Finance</span><code>fin_arun / Fin@123</code>
+          <span>HR</span><code>hr_divya / Hr@123</code>
+          <span>Marketing</span><code>marketing_sanjay / Market@123</code>
+        </div>
+        <p>These are demonstration credentials stored in this browser. Do not use them in a live deployment.</p>
+      </details>
+    </section>
+    <footer class="portal-footer">Global InfoCity TechPark · Commercial Space & Campus Operations</footer>
+  </main>
 </body>
 </html>

@@ -1,0 +1,34 @@
+/* Additive department themes. The existing Super Admin theme remains the untouched default. */
+body.theme-sales { --park-teal:#087f70; --park-charcoal:#123b36; --park-bg:#f1f8f6; }
+body.theme-sales .navbar { background:linear-gradient(100deg,#0d453e,#087f70); }
+body.theme-sales .sidebar .nav-item.active { background:#e3f5ef; color:#075b4f; }
+body.theme-sales .sidebar .nav-item.active .nav-icon { color:#087f70; }
+body.theme-sales .page-heading-tag { background:#e8f6f1; border-color:#c6e8dc; color:#096555; }
+body.theme-sales .card { border-top:3px solid #0b8a77; }
+body.theme-sales-manager { --park-teal:#4a5ca8; --park-charcoal:#252f59; --park-bg:#f3f5fc; }
+body.theme-sales-manager .navbar { background:linear-gradient(100deg,#252f59,#5265b0); }
+body.theme-sales-manager .sidebar .nav-item.active { background:#e9edfb; color:#34458b; }
+body.theme-sales-manager .sidebar .nav-item.active .nav-icon { color:#4a5ca8; }
+body.theme-sales-manager .page-heading-tag { background:#eef0fc; border-color:#d6dcf5; color:#3e4e9a; }
+body.theme-sales-manager .card { border-top:3px solid #6576c2; }
+body.theme-finance { --park-teal:#2f7751; --park-charcoal:#173d2b; --park-bg:#f3f8f4; }
+body.theme-finance .navbar { background:linear-gradient(100deg,#173d2b,#347c54); }
+body.theme-finance .sidebar .nav-item.active { background:#e7f4e9; color:#245d3d; }
+body.theme-finance .sidebar .nav-item.active .nav-icon { color:#2f7751; }
+body.theme-finance .page-heading-tag { background:#edf7ee; border-color:#d2e9d5; color:#2a6842; }
+body.theme-finance .card { border-top:3px solid #438a5e; }
+body.theme-hr { --park-teal:#79519a; --park-charcoal:#39264b; --park-bg:#f8f5fa; }
+body.theme-hr .navbar { background:linear-gradient(100deg,#39264b,#79519a); }
+body.theme-hr .sidebar .nav-item.active { background:#f1e9f7; color:#613d80; }
+body.theme-hr .sidebar .nav-item.active .nav-icon { color:#79519a; }
+body.theme-hr .page-heading-tag { background:#f5eef9; border-color:#e7d9f0; color:#684188; }
+body.theme-hr .card { border-top:3px solid #9269af; }
+body.theme-marketing { --park-teal:#b65b3d; --park-charcoal:#542d22; --park-bg:#fff7f3; }
+body.theme-marketing .navbar { background:linear-gradient(100deg,#542d22,#b65b3d); }
+body.theme-marketing .sidebar .nav-item.active { background:#fff0e8; color:#93442d; }
+body.theme-marketing .sidebar .nav-item.active .nav-icon { color:#b65b3d; }
+body.theme-marketing .page-heading-tag { background:#fff1e9; border-color:#f4d9ca; color:#9a482e; }
+body.theme-marketing .card { border-top:3px solid #cb7556; }
+body.theme-hr .navbar, body.theme-sales .navbar, body.theme-sales-manager .navbar, body.theme-finance .navbar, body.theme-marketing .navbar { color:#fff; }
+body.theme-hr .navbar .brand-title, body.theme-sales .navbar .brand-title, body.theme-sales-manager .navbar .brand-title, body.theme-finance .navbar .brand-title, body.theme-marketing .navbar .brand-title { color:#fff; }
+body.theme-hr .navbar .brand-sub, body.theme-sales .navbar .brand-sub, body.theme-sales-manager .navbar .brand-sub, body.theme-finance .navbar .brand-sub, body.theme-marketing .navbar .brand-sub { color:rgba(255,255,255,.75); }
