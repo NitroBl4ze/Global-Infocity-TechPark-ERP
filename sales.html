@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global InfoCity TechPark — Leasing Sales Executive</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="department-themes.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="db.js"></script>
     <script src="sidebar.js" defer></script>
 </head>
-<body>
+<body class="theme-sales">
     <div class="navbar">
         <div class="brand-title">
             <div class="building-mark">
@@ -51,7 +51,7 @@
             <div class="sidebar-label">Lead Management</div>
             <a class="nav-item" id="nav-newlead" data-view="newlead" href="sales.html?view=newlead" title="Add Lead"><span class="nav-icon" aria-hidden="true">+</span><span class="nav-text">Add Lead</span></a>
         </section>
-                <section class="sidebar-group admin-only hidden" id="ownerNavGroup">
+                <section class="sidebar-group admin-only hidden" id="ownerNavGroup"><div class="sidebar-label">Other Departments</div><a class="nav-item" href="hr.html?view=overview"><span class="nav-icon">♙</span><span class="nav-text">Human Resources</span></a><a class="nav-item" href="marketing.html?view=overview"><span class="nav-icon">✳</span><span class="nav-text">Marketing</span></a><a class="nav-item" href="superadmin.html?view=amenities"><span class="nav-icon">☕</span><span class="nav-text">Amenities & Terrace</span></a>
                     <div class="sidebar-label">Sales Department</div>
                     <a class="nav-item" href="superadmin.html?view=pipeline" title="Super Admin"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Super Admin</span></a>
                     <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-text">Sales</span></a>

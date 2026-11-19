@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global InfoCity TechPark — Building Owner & SuperAdmin Command</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="department-operations.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="db.js"></script>
     <script src="sidebar.js" defer></script>
@@ -39,7 +39,7 @@
             </div>
             <nav class="sidebar-nav">
         <section class="sidebar-group">
-            <div class="sidebar-label">Overview</div>
+            <div class="sidebar-label">Overview</div><a class="nav-item" data-view="departments" href="superadmin.html?view=departments"><span class="nav-icon">⌂</span><span class="nav-text">Department Overview</span></a>
             <a class="nav-item" data-view="pipeline" href="superadmin.html?view=pipeline" title="Pipeline"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-text">Pipeline</span></a>
             <a class="nav-item" data-view="statistics" href="superadmin.html?view=statistics" title="Statistics"><span class="nav-icon" aria-hidden="true">▥</span><span class="nav-text">Statistics</span></a>
             <a class="nav-item" data-view="floorplan" href="superadmin.html?view=floorplan" title="Floor Availability"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Floor Availability</span></a>
@@ -48,7 +48,7 @@
             <div class="sidebar-label">Sales Department</div>
             <a class="nav-item" href="sales.html?view=board" title="Sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-text">Sales</span></a>
             <a class="nav-item" href="sales_manager.html?view=quotations" title="Sales Manager"><span class="nav-icon" aria-hidden="true">♧</span><span class="nav-text">Sales Manager</span></a>
-            <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a>
+            <a class="nav-item" href="finance.html?view=pnl" title="Finance"><span class="nav-icon" aria-hidden="true">₹</span><span class="nav-text">Finance</span></a><a class="nav-item" href="hr.html?view=overview"><span class="nav-icon">♙</span><span class="nav-text">Human Resources</span></a><a class="nav-item" href="marketing.html?view=overview"><span class="nav-icon">✳</span><span class="nav-text">Marketing</span></a>
         </section>
         <section class="sidebar-group">
             <div class="sidebar-label">Tenant & Asset Management</div>
@@ -60,7 +60,7 @@
         </section>
         <section class="sidebar-group">
             <div class="sidebar-label">Administration</div>
-            <a class="nav-item" data-view="rbac" href="superadmin.html?view=rbac" title="Staff RBAC & IndexedDB"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-text">Staff RBAC & IndexedDB</span></a>
+            <a class="nav-item" data-view="amenities" href="superadmin.html?view=amenities"><span class="nav-icon">☕</span><span class="nav-text">Amenities & Terrace</span></a><a class="nav-item" data-view="rbac" href="superadmin.html?view=rbac" title="Staff RBAC & IndexedDB"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-text">Staff RBAC & IndexedDB</span></a>
         </section>
             </nav>
 
@@ -79,6 +79,44 @@
                 <span class="pill-tag">Asset Valuation: ₹250 Cr</span>
             </div>
 
+            <div id="mod-departments" class="module-section hidden">
+              <div class="cards-grid">
+                <div class="card"><h3>Active Sales Opportunities</h3><div class="value" id="deptSalesLeads">0</div><a href="sales.html?view=board">Open Sales workspace →</a></div>
+                <div class="card"><h3>Pending Quotations</h3><div class="value" id="deptSalesQuotes">0</div><a href="sales_manager.html?view=quotations">Open Sales Manager →</a></div>
+                <div class="card"><h3>Booked Monthly Rent</h3><div class="value" id="deptBookedRent">₹0</div><a href="finance.html?view=pnl">Open Finance workspace →</a></div>
+                <div class="card"><h3>Pending User Approvals</h3><div class="value" id="deptPendingUsers">0</div><a href="hr.html?view=approvals">Open HR workspace →</a></div>
+              </div>
+              <div class="grid-2">
+                <div class="panel"><div class="panel-header"><h2>Department directory</h2><span class="pill-tag">Overview only</span></div>
+                  <div class="department-launch-list">
+                    <a href="sales.html?view=board"><span><strong>Sales</strong><small>Leads, calls, follow-ups and floor availability</small></span><b>Open full details →</b></a>
+                    <a href="sales_manager.html?view=quotations"><span><strong>Sales Manager</strong><small>Quotations, approvals, assignments and forecast</small></span><b>Open full details →</b></a>
+                    <a href="finance.html?view=pnl"><span><strong>Finance</strong><small>Booked leases, invoices, P&amp;L and reports</small></span><b>Open full details →</b></a>
+                    <a href="hr.html?view=overview"><span><strong>Human Resources</strong><small>Approvals, recruitment and campus workforce</small></span><b>Open full details →</b></a>
+                    <a href="marketing.html?view=overview"><span><strong>Marketing</strong><small>Social channels, content and campaigns</small></span><b>Open full details →</b></a>
+                  </div>
+                </div>
+                <div class="panel"><div class="panel-header"><h2>Campus amenities snapshot</h2><a href="superadmin.html?view=amenities">Manage amenities →</a></div><div id="departmentAmenitySummary"></div></div>
+              </div>
+            </div>
+            <div id="mod-amenities" class="module-section hidden">
+              <div class="panel"><div class="panel-header"><div><h2>Commercial Amenities & Terrace Operations</h2><p class="subtitle">Manage cafés, canteens, playgrounds, food courts, recreation and top-floor terrace facilities.</p></div></div>
+                <div class="cards-grid">
+                  <div class="card"><h3>Registered Amenities</h3><div class="value" id="amenityCount">0</div></div><div class="card"><h3>Operational</h3><div class="value" id="amenityActiveCount">0</div></div><div class="card"><h3>Terrace / Top-Floor</h3><div class="value" id="amenityTerraceCount">0</div></div><div class="card"><h3>Pending Setup</h3><div class="value" id="amenityPendingCount">0</div></div>
+                </div>
+                <form id="amenityForm" class="amenity-form"><h3 id="amenityFormTitle">Add a commercial or recreational amenity</h3><input id="amenityId" type="hidden">
+                  <label>Amenity name<input id="amenityName" required></label>
+                  <label>Category<select id="amenityCategory"><option>Café</option><option>Canteen / Food Court</option><option>Restaurant</option><option>Playground / Recreation</option><option>Terrace Garden</option><option>Gym / Wellness</option><option>Convenience Store</option><option>ATM / Banking</option><option>Daycare</option><option>Other</option></select></label>
+                  <label>Tower / location<select id="amenityLocation"><option>Tower A — Ground Floor</option><option>Tower B — Ground Floor</option><option>Tower C — Ground Floor</option><option>Tower A — Top Floor Terrace</option><option>Tower B — Top Floor Terrace</option><option>Tower C — Top Floor Terrace</option><option>Central Campus</option><option>Outdoor Campus</option></select></label>
+                  <label>Area (sq.ft)<input id="amenityArea" type="number" min="0" value="0"></label><label>Operator / tenant<input id="amenityOperator"></label><label>Capacity / seats<input id="amenityCapacity" type="number" min="0" value="0"></label>
+                  <label>Operating model<select id="amenityModel"><option>Lease to operator</option><option>Revenue share</option><option>Managed by Global InfoCity</option><option>Contract service</option><option>Common facility</option></select></label>
+                  <label>Monthly rent / contract (₹)<input id="amenityRent" type="number" min="0" value="0"></label><label>Opening hours<input id="amenityHours"></label>
+                  <label>Status<select id="amenityStatus"><option>Planned</option><option>Setup in Progress</option><option>Operational</option><option>Temporarily Closed</option><option>Under Maintenance</option></select></label><label>Contact / manager<input id="amenityContact"></label><label>Notes<textarea id="amenityNotes" rows="2"></textarea></label>
+                  <div class="amenity-form-actions"><button type="submit" class="btn-primary">Save amenity</button><button type="button" class="btn-sm btn-secondary" id="amenityCancelEdit">Clear form</button></div>
+                </form>
+              </div>
+              <div class="panel"><div class="panel-header"><h2>Amenity and facility register</h2></div><div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Category</th><th>Location</th><th>Area</th><th>Operator</th><th>Capacity</th><th>Model</th><th>Status</th><th>Actions</th></tr></thead><tbody id="amenityTableBody"></tbody></table></div></div>
+            </div>
             <div id="mod-pipeline" class="module-section">
                 <div class="panel">
                     <div class="panel-header">
@@ -552,6 +590,8 @@
         ];
 
         const OWNER_VIEW_META = {
+            departments: { title:'Department Overview',description:'Review high-level department KPIs and open separate workspaces for full operational details.',tag:'Executive overview' },
+            amenities: { title:'Amenities & Terrace Operations',description:'Manage cafés, canteens, playgrounds, recreation zones and commercial terrace spaces.',tag:'Campus amenities' },
             pipeline: { title: 'Leasing Pipeline', description: 'Review company inquiries across the full leasing lifecycle, with lead source and allocated space visible on every record.', tag: 'Pipeline overview' },
             statistics: { title: 'Portfolio Statistics', description: 'Track inquiry volume, booked monthly rent, deposits, lost opportunities and lead acquisition sources.', tag: 'Performance insights' },
             floorplan: { title: 'Floor Availability', description: 'See how Tower A, Tower B and Tower C suites are allocated, in negotiation or vacant.', tag: 'Space allocation' },
@@ -591,6 +631,8 @@
             const compliance = JSON.parse(localStorage.getItem('infocity_compliance')) || [];
 
             renderMasterPipelineAndFloor(leases);
+            renderDepartmentOverview(leases);
+            renderAmenities();
             renderPillar1Screening(leases);
             renderPillar2Agreements(leases);
             renderPillar3Financials(leases);
@@ -598,6 +640,49 @@
             renderPillar5PropTaxAndInsurance(leases, compliance);
             loadUsers();
         }
+
+        function ownEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+        function getAmenities(){
+          let a=JSON.parse(localStorage.getItem('infocity_facility_amenities')||'[]');
+          if(!a.length){a=[
+            {id:8101,name:'Global Café',category:'Café',location:'Tower A — Ground Floor',area:1800,operator:'Operator to be appointed',capacity:70,model:'Lease to operator',rent:0,hours:'08:00–20:00',status:'Planned',contact:'',notes:'Proposed tenant and visitor café.'},
+            {id:8102,name:'Campus Canteen',category:'Canteen / Food Court',location:'Tower B — Ground Floor',area:4200,operator:'Food service vendor to be appointed',capacity:220,model:'Contract service',rent:0,hours:'07:00–22:00',status:'Planned',contact:'',notes:'Employee and visitor meal service.'},
+            {id:8103,name:'Sky Terrace Recreation Zone',category:'Playground / Recreation',location:'Tower A — Top Floor Terrace',area:6500,operator:'Global InfoCity Facilities',capacity:100,model:'Common facility',rent:0,hours:'06:00–21:00',status:'Setup in Progress',contact:'',notes:'Proposed terrace recreation; subject to structural, fire, access and safety approvals.'},
+            {id:8104,name:'Terrace Bistro',category:'Restaurant',location:'Tower B — Top Floor Terrace',area:3000,operator:'Vendor to be appointed',capacity:110,model:'Lease to operator',rent:0,hours:'11:00–23:00',status:'Planned',contact:'',notes:'Proposed rooftop dining space; subject to permitted use and safety approvals.'}
+          ];localStorage.setItem('infocity_facility_amenities',JSON.stringify(a));}return a;
+        }
+        function renderDepartmentOverview(leases){
+          const b=leases.filter(x=>x.stage==='Booked'),p=JSON.parse(localStorage.getItem('infocity_user_applications')||'[]').filter(x=>x.status==='Pending');
+          document.getElementById('deptSalesLeads').textContent=leases.filter(x=>x.stage!=='Lost').length;
+          document.getElementById('deptSalesQuotes').textContent=leases.filter(x=>x.stage==='Quotation').length;
+          document.getElementById('deptBookedRent').textContent='₹'+b.reduce((n,x)=>n+window.InfoCityDB.calcRent(x),0).toLocaleString('en-IN');
+          document.getElementById('deptPendingUsers').textContent=p.length;
+          document.getElementById('departmentAmenitySummary').innerHTML=getAmenities().slice(0,5).map(x=>'<div class="department-mini-row"><span><strong>'+ownEsc(x.name)+'</strong><small>'+ownEsc(x.category)+' · '+ownEsc(x.location)+'</small></span><b>'+ownEsc(x.status)+'</b></div>').join('');
+        }
+        function renderAmenities(){
+          const a=getAmenities();
+          document.getElementById('amenityCount').textContent=a.length;
+          document.getElementById('amenityActiveCount').textContent=a.filter(x=>x.status==='Operational').length;
+          document.getElementById('amenityTerraceCount').textContent=a.filter(x=>/terrace/i.test(x.location)).length;
+          document.getElementById('amenityPendingCount').textContent=a.filter(x=>['Planned','Setup in Progress'].includes(x.status)).length;
+          document.getElementById('amenityTableBody').innerHTML=a.map(x=>'<tr><td>'+ownEsc(x.name)+'</td><td>'+ownEsc(x.category)+'</td><td>'+ownEsc(x.location)+'</td><td>'+Number(x.area||0).toLocaleString('en-IN')+'</td><td>'+ownEsc(x.operator)+'</td><td>'+Number(x.capacity||0)+'</td><td>'+ownEsc(x.model)+'</td><td>'+ownEsc(x.status)+'</td><td><button class="btn-sm btn-info" onclick="editAmenity('+x.id+')">Edit</button> <button class="btn-sm btn-danger" onclick="deleteAmenity('+x.id+')">Delete</button></td></tr>').join('');
+        }
+        function clearAmenity(){document.getElementById('amenityForm').reset();document.getElementById('amenityId').value='';document.getElementById('amenityFormTitle').textContent='Add a commercial or recreational amenity';}
+        function editAmenity(id){
+          const x=getAmenities().find(r=>Number(r.id)===Number(id));if(!x)return;
+          const map={amenityId:'id',amenityName:'name',amenityCategory:'category',amenityLocation:'location',amenityArea:'area',amenityOperator:'operator',amenityCapacity:'capacity',amenityModel:'model',amenityRent:'rent',amenityHours:'hours',amenityStatus:'status',amenityContact:'contact',amenityNotes:'notes'};
+          Object.entries(map).forEach(([k,v])=>document.getElementById(k).value=x[v]??'');
+          document.getElementById('amenityFormTitle').textContent='Edit amenity';document.getElementById('amenityForm').scrollIntoView({behavior:'smooth'});
+        }
+        function deleteAmenity(id){if(!confirm('Delete this amenity record?'))return;localStorage.setItem('infocity_facility_amenities',JSON.stringify(getAmenities().filter(x=>Number(x.id)!==Number(id))));renderAmenities();renderDepartmentOverview(JSON.parse(localStorage.getItem('infocity_leases')||'[]'));}
+        window.editAmenity=editAmenity;window.deleteAmenity=deleteAmenity;
+        document.getElementById('amenityForm').addEventListener('submit',e=>{
+          e.preventDefault();const id=Number(document.getElementById('amenityId').value),rows=getAmenities(),item={id:id||Date.now()};
+          const map={amenityName:'name',amenityCategory:'category',amenityLocation:'location',amenityArea:'area',amenityOperator:'operator',amenityCapacity:'capacity',amenityModel:'model',amenityRent:'rent',amenityHours:'hours',amenityStatus:'status',amenityContact:'contact',amenityNotes:'notes'};
+          Object.entries(map).forEach(([k,v])=>{const val=document.getElementById(k).value;item[v]=['area','capacity','rent'].includes(v)?Number(val||0):val;});
+          const ix=rows.findIndex(x=>Number(x.id)===id);if(ix>=0)rows[ix]=item;else rows.unshift(item);localStorage.setItem('infocity_facility_amenities',JSON.stringify(rows));clearAmenity();renderAmenities();renderDepartmentOverview(JSON.parse(localStorage.getItem('infocity_leases')||'[]'));
+        });
+        document.getElementById('amenityCancelEdit').addEventListener('click',clearAmenity);
 
         /* Pipeline, statistics, and floor availability */
         function renderMasterPipelineAndFloor(leases) {
