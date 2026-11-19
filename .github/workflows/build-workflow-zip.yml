@@ -1,0 +1,27 @@
+name: Build department workflow ZIP
+
+on:
+  push:
+    branches:
+      - feat/department-workflows-navigation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+      - name: Build source archive
+        run: |
+          mkdir -p dist
+          zip -r dist/Global-Infocity-TechPark-Department-Workflows.zip . -x ".git/*" "dist/*"
+      - name: Upload source ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: global-infocity-department-workflows
+          path: dist/Global-Infocity-TechPark-Department-Workflows.zip
+          retention-days: 14
