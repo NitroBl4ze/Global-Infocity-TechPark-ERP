@@ -1,194 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global InfoCity TechPark — HR & Facility Staffing</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="db.js"></script>
-    <script src="sidebar.js" defer></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Global InfoCity — People & Workforce Operations</title>
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="department-themes.css">
+  <script src="db.js"></script><script src="email-service.js"></script><script src="sidebar.js" defer></script><script src="hr-operations.js" defer></script>
 </head>
-<body>
-    <div class="navbar">
-        <div class="brand-title">
-            <div class="building-mark">
-                <span class="b-tower b-t1"></span>
-                <span class="b-tower b-t2"></span>
-                <span class="b-tower b-t3"></span>
-            </div>
-            <span>Global InfoCity TechPark</span>
-            <span class="brand-sub">HR, Leasing Talent & Facility Staffing</span>
-        </div>
-        <div class="nav-right">
-            <span id="userDisplay"></span>
-            <span class="badge">HR Operations</span>
-            <button class="btn-logout" onclick="logout()">Sign Out</button>
-        </div>
-    </div>
-
-    <div class="admin-layout">
-                <aside class="sidebar" id="appSidebar" aria-label="Main navigation">
-            <div class="sidebar-head">
-                <div class="sidebar-head-copy">
-                    <span class="sidebar-eyebrow">GLOBAL INFOCITY</span>
-                    <strong>HR Operations</strong>
-                    <small>Hiring & campus staffing</small>
-                </div>
-                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation"><span aria-hidden="true">‹</span></button>
-            </div>
-            <nav class="sidebar-nav">
-        <section class="sidebar-group">
-            <div class="sidebar-label">People Operations</div>
-            <a class="nav-item active" data-view="hiring" href="hr.html?view=hiring" title="TechPark Hiring Pipeline"><span class="nav-icon" aria-hidden="true">♙</span><span class="nav-text">TechPark Hiring Pipeline</span></a>
-            <a class="nav-item" data-view="leaves" href="hr.html?view=leaves" title="Staff Leave Approvals"><span class="nav-icon" aria-hidden="true">▣</span><span class="nav-text">Staff Leave Approvals</span></a>
+<body class="theme-hr">
+  <div class="navbar">
+    <div class="brand-title"><div class="building-mark"><span class="b-tower b-t1"></span><span class="b-tower b-t2"></span><span class="b-tower b-t3"></span></div><span>Global InfoCity</span><span class="brand-sub">People & Workforce Operations</span></div>
+    <div class="nav-right"><span id="userDisplay"></span><span class="badge" id="roleBadge">Human Resources</span><button class="btn-logout" id="hrLogout">Sign Out</button></div>
+  </div>
+  <div class="admin-layout">
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-head"><div class="sidebar-head-copy"><span class="sidebar-eyebrow">PEOPLE OPERATIONS</span><strong>HR Workspace</strong><small>Employees · Contractors · Campus teams</small></div><button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle navigation">‹</button></div>
+      <nav class="sidebar-nav">
+        <section class="sidebar-group"><div class="sidebar-label">HR Command</div>
+          <a class="nav-item" data-view="overview" href="hr.html?view=overview"><span class="nav-icon">▦</span><span class="nav-text">Overview</span></a>
+          <a class="nav-item" data-view="approvals" href="hr.html?view=approvals"><span class="nav-icon">✓</span><span class="nav-text">New User Approvals</span><span class="nav-count" id="pendingBadge">0</span></a>
+          <a class="nav-item" data-view="recruitment" href="hr.html?view=recruitment"><span class="nav-icon">♙</span><span class="nav-text">Recruitment</span></a>
+          <a class="nav-item" data-view="workforce" href="hr.html?view=workforce"><span class="nav-icon">♟</span><span class="nav-text">Employee Directory</span></a>
+          <a class="nav-item" data-view="contractors" href="hr.html?view=contractors"><span class="nav-icon">⌂</span><span class="nav-text">Contract & Facility Workforce</span></a>
         </section>
-            </nav>
+        <section class="sidebar-group"><div class="sidebar-label">People Services</div>
+          <a class="nav-item" data-view="attendance" href="hr.html?view=attendance"><span class="nav-icon">◷</span><span class="nav-text">Attendance & Shifts</span></a>
+          <a class="nav-item" data-view="leave" href="hr.html?view=leave"><span class="nav-icon">▣</span><span class="nav-text">Leave Management</span></a>
+          <a class="nav-item" data-view="learning" href="hr.html?view=learning"><span class="nav-icon">⌁</span><span class="nav-text">Training & Performance</span></a>
+          <a class="nav-item" data-view="relations" href="hr.html?view=relations"><span class="nav-icon">♡</span><span class="nav-text">Employee Relations</span></a>
+          <a class="nav-item" data-view="compliance" href="hr.html?view=compliance"><span class="nav-icon">⚑</span><span class="nav-text">HR Compliance</span></a>
+        </section>
+        <section class="sidebar-group admin-only hidden" id="hrAdminLinks"><div class="sidebar-label">Management</div>
+          <a class="nav-item" href="superadmin.html?view=departments"><span class="nav-icon">⌂</span><span class="nav-text">Super Admin Overview</span></a>
+        </section>
+      </nav>
+    </aside>
 
+    <main class="main-content">
+      <header class="page-heading"><div><span class="page-eyebrow">HUMAN RESOURCES & FACILITY STAFFING</span><h1 id="hrPageTitle">People Operations Overview</h1><p id="hrPageDescription">Manage the people who keep Global InfoCity running, from office teams to essential campus services.</p></div><span class="page-heading-tag" id="hrPageTag">HR operations</span></header>
+      <section class="crm-notice"><div><strong>Campus workforce:</strong> Track permanent employees, contract vendors, service-level requirements, attendance, training and statutory documents in one workspace.</div><span class="pill-tag">Global InfoCity · People</span></section>
 
-        </aside>
-
-        <div class="main-content">
-            <header class="page-heading"><div><span class="page-eyebrow">PEOPLE OPERATIONS</span><h1 id="hrPageTitle">TechPark Hiring Pipeline</h1><p id="hrPageDescription">Manage staffing requirements and active recruitment.</p></div></header>
-            <div class="crm-notice">
-                <div><strong>TechPark HR Operations:</strong> Manage recruitment for Commercial Leasing Executives, HVAC/BMS Facility Engineers, Campus Security, and Tenant Relations staff.</div>
-                <span class="pill-tag">Campus Staff: 96</span>
-            </div>
-
-            <div id="mod-hiring" class="mod-sec">
-                <div class="cards-grid">
-                    <div class="card blue"><h3>Total TechPark Staff</h3><div class="value" id="totalEmp">96</div></div>
-                    <div class="card green"><h3>Hired This Quarter</h3><div class="value" id="hiredCount">6</div></div>
-                    <div class="card red"><h3>Open Positions</h3><div class="value" id="openPos">4</div></div>
-                    <div class="card"><h3>Active Shifts</h3><div class="value">24x7 BMS Ops</div></div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header"><h2>Post New TechPark Job Opening</h2></div>
-                    <div style="display:grid; grid-template-columns: 2fr 1.5fr 1fr; gap:10px;">
-                        <input type="text" id="jobTitle" placeholder="Job Role (e.g., Senior Commercial Leasing Executive)" style="margin:0;">
-                        <input type="text" id="jobDept" placeholder="Department (e.g., Leasing / Facility Engineering)" style="margin:0;">
-                        <button class="btn-primary" style="margin:0;" onclick="addOpening()">+ Publish Opening</button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header"><h2>Active Recruitment Requisitions</h2></div>
-                    <table>
-                        <thead><tr><th>Role Title</th><th>Department</th><th>Applicants</th><th>Stage</th><th>Action</th></tr></thead>
-                        <tbody id="hiringTable">
-                            <tr>
-                                <td><strong>Commercial Leasing Executive (IT Parks)</strong></td>
-                                <td>Leasing Sales</td>
-                                <td>19 Candidates</td>
-                                <td><span class="pill-tag">Final Round</span></td>
-                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Lead BMS & HVAC Facility Engineer</strong></td>
-                                <td>Tower Operations</td>
-                                <td>14 Candidates</td>
-                                <td><span class="pill-tag">Technical Assessment</span></td>
-                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Tenant Fit-Out Coordinator</strong></td>
-                                <td>Project Management</td>
-                                <td>11 Candidates</td>
-                                <td><span class="pill-tag">HR Screening</span></td>
-                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Commercial Real Estate Finance Executive</strong></td>
-                                <td>Finance</td>
-                                <td>9 Candidates</td>
-                                <td><span class="pill-tag">Offer Released</span></td>
-                                <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="mod-leaves" class="mod-sec hidden">
-                <div class="panel">
-                    <div class="panel-header"><h2>Employee Leave Requests</h2></div>
-                    <table>
-                        <thead><tr><th>Employee</th><th>Role / Dept</th><th>Leave Type</th><th>Duration</th><th>Action</th></tr></thead>
-                        <tbody>
-                            <tr id="lv1">
-                                <td><strong>Karthik Raja</strong></td><td>Leasing Sales</td><td>Casual Leave</td><td>2 Days</td>
-                                <td>
-                                    <button class="btn-sm btn-success" onclick="decideLeave('lv1', 'Approved')">Approve</button>
-                                    <button class="btn-sm btn-danger" onclick="decideLeave('lv1', 'Rejected')">Reject</button>
-                                </td>
-                            </tr>
-                            <tr id="lv2">
-                                <td><strong>Arun Kumar</strong></td><td>Commercial Finance</td><td>Medical Leave</td><td>1 Day</td>
-                                <td>
-                                    <button class="btn-sm btn-success" onclick="decideLeave('lv2', 'Approved')">Approve</button>
-                                    <button class="btn-sm btn-danger" onclick="decideLeave('lv2', 'Rejected')">Reject</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <section class="hr-view" id="hr-overview">
+        <div class="cards-grid">
+          <div class="card"><h3>Pending Account Requests</h3><div class="value" id="kpiPending">0</div></div>
+          <div class="card"><h3>Active Employees</h3><div class="value" id="kpiEmployees">0</div></div>
+          <div class="card"><h3>Contract Workforce</h3><div class="value" id="kpiContractors">0</div></div>
+          <div class="card"><h3>Open Recruitment</h3><div class="value" id="kpiOpenJobs">0</div></div>
         </div>
-    </div>
+        <div class="grid-2">
+          <div class="panel"><div class="panel-header"><h2>People operations quick access</h2></div><div class="hr-quick-grid">
+            <a href="hr.html?view=approvals">Review new registrations <span>→</span></a><a href="hr.html?view=contractors">Manage campus contractors <span>→</span></a>
+            <a href="hr.html?view=attendance">Shift & attendance <span>→</span></a><a href="hr.html?view=compliance">Statutory compliance <span>→</span></a>
+          </div></div>
+          <div class="panel"><div class="panel-header"><h2>Workforce by service</h2></div><div id="workforceSummary" class="hr-summary-list"></div></div>
+        </div>
+        <div class="panel"><div class="panel-header"><h2>Recent HR activity</h2></div><div class="table-wrap"><table><thead><tr><th>Time</th><th>Employee / Applicant</th><th>Activity</th><th>Module</th></tr></thead><tbody id="hrActivityBody"></tbody></table></div></div>
+      </section>
 
-    <script>
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser || currentUser.role !== 'HR') window.location.href = 'index.html';
-        document.getElementById('userDisplay').innerText = currentUser.name;
-        activateHRView();
+      <section class="hr-view hidden" id="hr-approvals">
+        <div class="panel"><div class="panel-header"><div><h2>New user registration requests</h2><p class="subtitle">HR reviews the submitted information, chooses the correct role and activates the account.</p></div><span class="pill-tag" id="approvalCount">0 pending</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Applicant</th><th>Contact</th><th>Preferred team</th><th>Position / Experience</th><th>Submitted</th><th>Review</th></tr></thead><tbody id="applicationTableBody"></tbody></table></div>
+          <p class="hr-helper">Approving a request creates an active demo account and records the email notification. Real email delivery requires configuring the email provider in <code>email-service.js</code>. A production system must move approval and password handling to a secure backend.</p>
+        </div>
+      </section>
 
-        let staff = 96, hired = 6, open = 4;
+      <section class="hr-view hidden" id="hr-recruitment">
+        <div class="grid-2">
+          <div class="panel"><div class="panel-header"><h2>Publish a vacancy</h2></div><form id="jobForm" class="form-grid"><label>Position title<input id="jobTitle" required placeholder="Facility Engineer"></label><label>Department / service<select id="jobDepartment"><option>Administration</option><option>Leasing & Sales</option><option>Facilities</option><option>Security</option><option>Housekeeping</option><option>Engineering</option><option>Finance</option><option>Human Resources</option><option>Marketing</option></select></label><label>Employment type<select id="jobType"><option>Permanent</option><option>Fixed-term</option><option>Contract</option><option>Apprentice / Intern</option></select></label><label>Open positions<input id="jobCount" type="number" min="1" value="1" required></label><label class="full-span">Role summary<textarea id="jobDescription" rows="3" placeholder="Responsibilities and requirements"></textarea></label><button class="btn-primary" type="submit">Publish vacancy</button></form></div>
+          <div class="panel"><div class="panel-header"><h2>Recruitment pipeline</h2></div><div id="recruitmentStats" class="hr-summary-list"></div></div>
+        </div>
+        <div class="panel"><div class="panel-header"><h2>Open vacancies</h2></div><div class="table-wrap"><table><thead><tr><th>Role</th><th>Department</th><th>Type</th><th>Openings</th><th>Status</th><th>Action</th></tr></thead><tbody id="jobTableBody"></tbody></table></div></div>
+      </section>
 
-        function activateHRView() {
-            const requested = new URLSearchParams(window.location.search).get('view') || 'hiring';
-            const view = ['hiring', 'leaves'].includes(requested) ? requested : 'hiring';
-            document.querySelectorAll('.mod-sec').forEach(section => section.classList.toggle('hidden', section.id !== `mod-${view}`));
-            document.querySelectorAll('.sidebar [data-view]').forEach(link => link.classList.toggle('active', link.dataset.view === view));
-            document.getElementById('hrPageTitle').textContent = view === 'hiring' ? 'TechPark Hiring Pipeline' : 'Staff Leave Approvals';
-            document.getElementById('hrPageDescription').textContent = view === 'hiring' ? 'Manage staffing requirements and active recruitment.' : 'Review employee leave requests and record approval decisions.';
-        }
-        function switchMod(id) { window.location.href = `hr.html?view=${encodeURIComponent(id)}`; }
+      <section class="hr-view hidden" id="hr-workforce">
+        <div class="panel"><div class="panel-header"><h2>Employee directory</h2><button class="btn-sm btn-info" id="exportEmployees">Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username / Email</th><th>Department</th><th>Access scope</th><th>Status</th></tr></thead><tbody id="employeeTableBody"></tbody></table></div></div>
+      </section>
 
-        function addOpening() {
-            const role = document.getElementById('jobTitle').value.trim();
-            const dept = document.getElementById('jobDept').value.trim();
-            if (!role || !dept) return alert("Enter role and department!");
-            document.getElementById('hiringTable').innerHTML += `
-                <tr>
-                    <td><strong>${role}</strong></td>
-                    <td>${dept}</td>
-                    <td>1 Candidate</td>
-                    <td><span class="pill-tag">Open</span></td>
-                    <td><button class="btn-sm btn-success" onclick="hireStaff()">+ Hire Candidate</button></td>
-                </tr>
-            `;
-            open++;
-            document.getElementById('openPos').innerText = open;
-            document.getElementById('jobTitle').value = '';
-            document.getElementById('jobDept').value = '';
-        }
+      <section class="hr-view hidden" id="hr-contractors">
+        <div class="grid-2">
+          <div class="panel"><div class="panel-header"><h2>Add contract worker / vendor</h2></div><form id="contractorForm" class="form-grid">
+            <label>Worker / vendor name<input id="contractorName" required></label><label>Service category<select id="contractorService"><option>Housekeeping & Cleaning</option><option>Security & Surveillance</option><option>Lift / Elevator Maintenance</option><option>Parking Operations</option><option>HVAC & BMS Maintenance</option><option>Electrical & DG Maintenance</option><option>Plumbing & Water Systems</option><option>Landscaping & Horticulture</option><option>Waste Management</option><option>Pest Control</option><option>Fire & Safety</option><option>Cafeteria / Food Services</option><option>Playground / Recreation</option><option>General Civil Maintenance</option></select></label>
+            <label>Engagement type<select id="contractorType"><option>Vendor Company</option><option>Individual Contract</option><option>Manpower Agency</option></select></label><label>Headcount<input id="contractorCount" type="number" min="1" value="1"></label>
+            <label>Supervisor / contact<input id="contractorSupervisor"></label><label>Phone / email<input id="contractorContact"></label><label>Contract start<input id="contractStart" type="date"></label><label>Contract end<input id="contractEnd" type="date"></label><label>Monthly contract value (₹)<input id="contractValue" type="number" min="0" value="0"></label><label>Shift coverage<select id="contractShift"><option>Day</option><option>Night</option><option>24 × 7</option><option>Rotational</option></select></label>
+            <button class="btn-primary" type="submit">Add workforce record</button>
+          </form></div>
+          <div class="panel"><div class="panel-header"><h2>Campus service coverage</h2></div><div id="contractCoverage" class="hr-summary-list"></div></div>
+        </div>
+        <div class="panel"><div class="panel-header"><h2>Contractor and service partner register</h2></div><div class="table-wrap"><table><thead><tr><th>Partner / worker</th><th>Service</th><th>Type</th><th>Headcount</th><th>Contract period</th><th>Value / month</th><th>Status</th><th>Action</th></tr></thead><tbody id="contractorTableBody"></tbody></table></div></div>
+      </section>
 
-        function hireStaff() {
-            staff++;
-            hired++;
-            document.getElementById('totalEmp').innerText = staff;
-            document.getElementById('hiredCount').innerText = hired;
-            alert("Candidate onboarded into Global InfoCity TechPark staff directory!");
-        }
+      <section class="hr-view hidden" id="hr-attendance">
+        <div class="grid-2"><div class="panel"><div class="panel-header"><h2>Record attendance / shift coverage</h2></div><form id="attendanceForm" class="form-grid"><label>Employee / worker<input id="attendanceName" required></label><label>Service / department<input id="attendanceDepartment" required placeholder="Security, housekeeping..."></label><label>Work date<input id="attendanceDate" type="date" required></label><label>Shift<select id="attendanceShift"><option>Morning</option><option>General</option><option>Evening</option><option>Night</option><option>24 × 7</option></select></label><label>Attendance status<select id="attendanceStatus"><option>Present</option><option>Absent</option><option>Weekly Off</option><option>On Leave</option><option>Overtime</option></select></label><button class="btn-primary" type="submit">Save attendance</button></form></div><div class="panel"><div class="panel-header"><h2>Attendance controls</h2></div><p class="subtitle">Demo attendance register supports date, shift and service-level monitoring. Integrate biometric or vendor attendance feeds for production.</p><div id="attendanceKpis" class="hr-summary-list"></div></div></div>
+        <div class="panel"><div class="panel-header"><h2>Attendance register</h2></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Department / Service</th><th>Date</th><th>Shift</th><th>Status</th></tr></thead><tbody id="attendanceTableBody"></tbody></table></div></div>
+      </section>
 
-        function decideLeave(id, status) {
-            document.getElementById(id).cells[4].innerHTML = `<span class="pill-tag">${status}</span>`;
-        }
+      <section class="hr-view hidden" id="hr-leave">
+        <div class="panel"><div class="panel-header"><h2>Leave requests & approvals</h2></div><form id="leaveForm" class="form-grid"><label>Employee<input id="leaveEmployee" required></label><label>Leave type<select id="leaveType"><option>Annual / Earned</option><option>Sick</option><option>Casual</option><option>Compensatory Off</option><option>Unpaid</option></select></label><label>From<input id="leaveFrom" type="date" required></label><label>To<input id="leaveTo" type="date" required></label><label class="full-span">Reason<textarea id="leaveReason" rows="2"></textarea></label><button class="btn-primary" type="submit">Submit leave request</button></form></div>
+        <div class="panel"><div class="panel-header"><h2>Leave queue</h2></div><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Type</th><th>Period</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead><tbody id="leaveTableBody"></tbody></table></div></div>
+      </section>
 
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        }
-    </script>
+      <section class="hr-view hidden" id="hr-learning">
+        <div class="grid-2"><div class="panel"><div class="panel-header"><h2>Learning / induction programme</h2></div><form id="trainingForm" class="form-grid"><label>Programme title<input id="trainingTitle" required></label><label>Target team<input id="trainingTeam" placeholder="All employees"></label><label>Training date<input id="trainingDate" type="date"></label><label>Owner / trainer<input id="trainingOwner"></label><button class="btn-primary" type="submit">Add programme</button></form></div><div class="panel"><div class="panel-header"><h2>Performance review record</h2></div><form id="performanceForm" class="form-grid"><label>Employee<input id="performanceEmployee" required></label><label>Review period<input id="performancePeriod" placeholder="Q4 2026"></label><label>Rating<select id="performanceRating"><option>Exceeds Expectations</option><option>Meets Expectations</option><option>Needs Improvement</option><option>Unsatisfactory</option></select></label><label>Reviewer<input id="performanceReviewer"></label><button class="btn-primary" type="submit">Save review</button></form></div></div>
+        <div class="panel"><div class="panel-header"><h2>Training calendar</h2></div><div class="table-wrap"><table><thead><tr><th>Programme</th><th>Target team</th><th>Date</th><th>Trainer</th></tr></thead><tbody id="trainingTableBody"></tbody></table></div></div>
+        <div class="panel"><div class="panel-header"><h2>Performance review log</h2></div><div class="table-wrap"><table><thead><tr><th>Employee</th><th>Period</th><th>Rating</th><th>Reviewer</th></tr></thead><tbody id="performanceTableBody"></tbody></table></div></div>
+      </section>
+
+      <section class="hr-view hidden" id="hr-relations">
+        <div class="grid-2"><div class="panel"><div class="panel-header"><h2>Employee relations / grievance log</h2></div><form id="relationForm" class="form-grid"><label>Employee / reporter<input id="relationPerson" required></label><label>Category<select id="relationCategory"><option>Workplace concern</option><option>Safety issue</option><option>Conduct / disciplinary</option><option>Harassment complaint</option><option>Welfare / accommodation</option><option>Recognition</option></select></label><label>Priority<select id="relationPriority"><option>Normal</option><option>High</option><option>Confidential</option><option>Urgent</option></select></label><label class="full-span">Summary<textarea id="relationSummary" rows="3" required></textarea></label><button class="btn-primary" type="submit">Record confidential case</button></form></div><div class="panel"><div class="panel-header"><h2>HR case handling</h2></div><p class="subtitle">Record only the minimum necessary personal data. Restrict access to authorised HR personnel and use a secure case-management service for sensitive matters.</p><div id="relationStats" class="hr-summary-list"></div></div></div>
+        <div class="panel"><div class="panel-header"><h2>Case register</h2></div><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Reporter</th><th>Category</th><th>Priority</th><th>Summary</th><th>Status</th><th>Action</th></tr></thead><tbody id="relationTableBody"></tbody></table></div></div>
+      </section>
+
+      <section class="hr-view hidden" id="hr-compliance">
+        <div class="panel"><div class="panel-header"><h2>HR & contractor compliance checklist</h2><p class="subtitle">Track applicability and evidence; final legal compliance should be verified by the organisation's HR/legal team.</p></div>
+          <div id="complianceChecklist" class="hr-check-grid">
+            <label><input type="checkbox" data-compliance="Employment agreements"> Employment agreements and appointment letters</label>
+            <label><input type="checkbox" data-compliance="Wage and payroll records"> Wage, payroll and bank transfer records</label>
+            <label><input type="checkbox" data-compliance="EPF / ESI review"> EPF / ESI applicability and remittances</label>
+            <label><input type="checkbox" data-compliance="Contract labour records"> Contract labour licence / registration review</label>
+            <label><input type="checkbox" data-compliance="Vendor insurance"> Vendor and worker insurance evidence</label>
+            <label><input type="checkbox" data-compliance="Safety induction"> Safety induction and PPE acknowledgement</label>
+            <label><input type="checkbox" data-compliance="Background verification"> Background verification where lawful and appropriate</label>
+            <label><input type="checkbox" data-compliance="POSH awareness"> POSH policy, awareness and committee process</label>
+            <label><input type="checkbox" data-compliance="Emergency training"> Emergency, fire and evacuation training</label>
+            <label><input type="checkbox" data-compliance="Shift and overtime records"> Shift, overtime and rest-period records</label>
+          </div><button class="btn-primary" id="saveCompliance">Save checklist</button><span id="complianceSaved" class="subtitle"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="approvalDialog" class="hr-dialog"><form method="dialog" id="approvalForm">
+    <div class="panel-header"><div><span class="page-eyebrow">HR DECISION</span><h2 id="approvalApplicantName">Approve applicant</h2></div><button class="btn-sm btn-secondary" value="cancel">✕</button></div>
+    <input type="hidden" id="approvalApplicationId">
+    <label for="approvalRole">Assign department role</label><select id="approvalRole" required><option value="">Select role</option><option>Sales</option><option>Sales Manager</option><option>Finance</option><option>HR</option><option>Marketing</option></select>
+    <label for="approvalScope">Authority / position scope</label><input id="approvalScope" placeholder="e.g. Housekeeping Supervisor / Chennai campus">
+    <p class="hr-helper">Approving activates the browser-demo account and attempts to send an email through the configured provider.</p>
+    <div class="dialog-actions"><button type="button" class="btn-sm btn-secondary" id="rejectApplication">Reject request</button><button type="submit" class="btn-primary">Approve & activate</button></div>
+  </form></dialog>
 </body>
 </html>
