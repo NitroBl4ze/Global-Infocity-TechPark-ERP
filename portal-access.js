@@ -49,8 +49,9 @@
       message.textContent = '';
     });
 
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('submit', async function (event) {
       event.preventDefault();
+      await (window.InfoCityDBReady || Promise.resolve()).catch(function () {});
       const selectedRole = document.getElementById('selectedPortalRole').value;
       const identifier = document.getElementById('portalUsername').value.trim().toLowerCase();
       const password = document.getElementById('portalPassword').value;

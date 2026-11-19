@@ -467,4 +467,4 @@ window.InfoCityDB = {
     syncNow: hydrateAndSyncStores
 };
 
-initInfoCityIndexedDB();
+window.InfoCityDBReady = initInfoCityIndexedDB();

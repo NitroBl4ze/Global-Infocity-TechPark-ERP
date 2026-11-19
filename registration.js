@@ -3,8 +3,9 @@
   function init() {
     const form = document.getElementById('registrationForm');
     if (!form) return;
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('submit', async function (event) {
       event.preventDefault();
+      await (window.InfoCityDBReady || Promise.resolve()).catch(function () {});
       const name = document.getElementById('appName').value.trim();
       const email = document.getElementById('appEmail').value.trim().toLowerCase();
       const phone = document.getElementById('appPhone').value.trim();
