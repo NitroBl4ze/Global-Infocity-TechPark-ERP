@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = "GlobalInfoCity_DB";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 const STORE_MAP = {
     "infocity_users": { store: "users", keyPath: "username" },
@@ -12,18 +12,24 @@ const STORE_MAP = {
     "infocity_compliance": { store: "building_compliance", keyPath: "id" },
     "infocity_finance_reports": { store: "finance_reports", keyPath: "id" },
     "infocity_audit_logs": { store: "audit_logs", keyPath: "id" },
-    "infocity_sys_config": { store: "sys_config", keyPath: "configKey" }
+    "infocity_sys_config": { store: "sys_config", keyPath: "configKey" },
+    "infocity_user_applications": { store: "user_applications", keyPath: "id" },
+    "infocity_marketing": { store: "marketing_records", keyPath: "id" },
+    "infocity_facility_amenities": { store: "facility_amenities", keyPath: "id" },
+    "infocity_hr_operations": { store: "hr_operations", keyPath: "id" },
+    "infocity_email_outbox": { store: "email_outbox", keyPath: "id" }
 };
 
 let dbInstance = null;
 const nativeSetItem = Storage.prototype.setItem;
 
 const SEED_USERS = [
-    { name: "Aditya Ram", username: "admin_aditya", password: "Super@123", role: "SuperAdmin", status: "Active", scope: "BUILDING_OWNER_FULL_CONTROL" },
-    { name: "Karthik Raja", username: "sales_karthik", password: "Sales@123", role: "Sales", status: "Active", scope: "LEADS_CALL_FOLLOWUP" },
-    { name: "Priya Darshini", username: "mgr_priya", password: "Mgr@123", role: "Sales Manager", status: "Active", scope: "QUOTATION_BOOKED_CONTROL" },
-    { name: "Arun Kumar", username: "fin_arun", password: "Fin@123", role: "Finance", status: "Active", scope: "BOOKED_INVOICING_PNL" },
-    { name: "Divya Bharathi", username: "hr_divya", password: "Hr@123", role: "HR", status: "Active", scope: "TECHPARK_STAFF_HR" }
+    { name: "Aditya Ram", username: "admin_aditya", email: "admin@globalinfocity.demo", password: "Super@123", role: "SuperAdmin", status: "Active", scope: "BUILDING_OWNER_FULL_CONTROL" },
+    { name: "Karthik Raja", username: "sales_karthik", email: "sales@globalinfocity.demo", password: "Sales@123", role: "Sales", status: "Active", scope: "LEADS_CALL_FOLLOWUP" },
+    { name: "Priya Darshini", username: "mgr_priya", email: "manager@globalinfocity.demo", password: "Mgr@123", role: "Sales Manager", status: "Active", scope: "QUOTATION_BOOKED_CONTROL" },
+    { name: "Arun Kumar", username: "fin_arun", email: "finance@globalinfocity.demo", password: "Fin@123", role: "Finance", status: "Active", scope: "BOOKED_INVOICING_PNL" },
+    { name: "Divya Bharathi", username: "hr_divya", email: "hr@globalinfocity.demo", password: "Hr@123", role: "HR", status: "Active", scope: "TECHPARK_STAFF_HR" },
+    { name: "Sanjay Kumar", username: "marketing_sanjay", email: "marketing@globalinfocity.demo", password: "Market@123", role: "Marketing", status: "Active", scope: "BRAND_SOCIAL_CAMPAIGNS" }
 ];
 
 // Enriched 6-Stage Commercial Leases with Full Owner Due Diligence, Legal, Tax & Utility Fields
@@ -315,6 +321,12 @@ function initInfoCityIndexedDB() {
             if (!db.objectStoreNames.contains("sys_config")) {
                 db.createObjectStore("sys_config", { keyPath: "configKey" });
             }
+            // Additive v3 stores. Existing records and the original stores are preserved.
+            for (const meta of Object.values(STORE_MAP)) {
+                if (!db.objectStoreNames.contains(meta.store)) {
+                    db.createObjectStore(meta.store, { keyPath: meta.keyPath });
+                }
+            }
         };
 
         request.onsuccess = async function (event) {
@@ -393,6 +405,20 @@ async function hydrateAndSyncStores() {
                 console.warn("Seed parse warning:", lsKey);
             }
         }
+    }
+
+    // Add newly introduced demo accounts without overwriting accounts created by HR.
+    const currentUsers = JSON.parse(localStorage.getItem("infocity_users") || "[]");
+    let usersChanged = false;
+    SEED_USERS.forEach(seed => {
+        if (!currentUsers.some(user => user.username === seed.username)) {
+            currentUsers.push(seed);
+            usersChanged = true;
+        }
+    });
+    if (usersChanged) {
+        nativeSetItem.call(localStorage, "infocity_users", JSON.stringify(currentUsers));
+        writeToObjectStore("users", "username", currentUsers);
     }
 }
 

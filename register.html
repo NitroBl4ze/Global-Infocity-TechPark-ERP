@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Register — Global InfoCity TechPark</title>
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="portal-access.css">
+  <script src="db.js"></script><script src="registration.js" defer></script>
+</head>
+<body class="portal-login-page">
+  <main class="portal-shell">
+    <section class="portal-brand">
+      <div class="building-mark"><span class="b-tower b-t1"></span><span class="b-tower b-t2"></span><span class="b-tower b-t3"></span></div>
+      <div><p class="portal-kicker">GLOBAL INFOCITY · EMPLOYEE REGISTRATION</p><h1>Request workspace access.</h1><p>Submit your details. HR will review your request, assign a role and activate your account.</p></div>
+    </section>
+    <section class="portal-card" style="max-width:700px">
+      <div class="portal-card-heading"><div><span class="portal-kicker">NEW USER</span><h2>Registration details</h2></div><span class="portal-secure-pill">HR approval required</span></div>
+      <form id="registrationForm" class="portal-login-form" style="max-width:none">
+        <div class="grid-2">
+          <div><label for="appName">Full name *</label><input id="appName" required maxlength="90" placeholder="Your full name"></div>
+          <div><label for="appEmail">Work email *</label><input id="appEmail" type="email" required placeholder="name@company.com"></div>
+          <div><label for="appPhone">Mobile number *</label><input id="appPhone" type="tel" required pattern="[0-9+() -]{8,18}" placeholder="+91"></div>
+          <div><label for="appPreference">Preferred team (optional)</label><select id="appPreference"><option value="">No preference</option><option>Sales</option><option>Sales Manager</option><option>Finance</option><option>HR</option><option>Marketing</option></select></div>
+          <div><label for="appPosition">Current / requested position</label><input id="appPosition" maxlength="100" placeholder="e.g. Facility Coordinator"></div>
+          <div><label for="appExperience">Experience</label><select id="appExperience"><option>Fresher</option><option>1–2 years</option><option>3–5 years</option><option>6–10 years</option><option>10+ years</option></select></div>
+        </div>
+        <label for="appPassword">Create password *</label><input id="appPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="At least 8 characters">
+        <label for="appNotes">Additional details</label><textarea id="appNotes" rows="3" maxlength="600" placeholder="Skills, department interest or any information for HR"></textarea>
+        <p class="portal-message" id="registrationMessage" role="status" aria-live="polite"></p>
+        <button type="submit" class="portal-submit">Submit registration request <span>→</span></button>
+      </form>
+      <div class="portal-register-strip"><span>Already have access?</span><a href="index.html">Return to sign in</a></div>
+      <p class="portal-demo-details">Your request remains pending until HR assigns a department role and activates the account. This static demo stores requests in the current browser; production use requires a shared backend and secure password handling.</p>
+    </section>
+  </main>
+</body>
+</html>
