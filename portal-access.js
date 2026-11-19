@@ -2,12 +2,12 @@
 (function () {
   'use strict';
   const PORTALS = [
-    { role: 'SuperAdmin', title: 'Super Admin', description: 'Portfolio command and complete campus oversight', icon: '⌂', className: 'portal-admin', route: 'superadmin.html?view=departments' },
-    { role: 'Sales', title: 'Sales', description: 'Company leads, calls and follow-ups', icon: '↗', className: 'portal-sales', route: 'sales.html?view=board' },
-    { role: 'Sales Manager', title: 'Sales Manager', description: 'Quotations, approvals and assignments', icon: '▤', className: 'portal-manager', route: 'sales_manager.html?view=quotations' },
-    { role: 'Finance', title: 'Finance', description: 'Booked leases, invoices and reports', icon: '₹', className: 'portal-finance', route: 'finance.html?view=pnl' },
-    { role: 'HR', title: 'Human Resources', description: 'People, recruitment and facility workforce', icon: '♙', className: 'portal-hr', route: 'hr.html?view=approvals' },
-    { role: 'Marketing', title: 'Marketing', description: 'Brand, social channels and campaign performance', icon: '✳', className: 'portal-marketing', route: 'marketing.html?view=overview' }
+    { role: 'SuperAdmin', title: 'Super Admin', description: 'Complete TechPark and department access', icon: '⌂', className: 'portal-admin', route: 'superadmin.html?view=departments' },
+    { role: 'HR', title: 'Human Resources', description: 'Registrations, employees and campus workforce', icon: '♙', className: 'portal-hr', route: 'hr.html?view=overview' },
+    { role: 'Sales', title: 'Sales', description: 'Leads, calls, follow-ups and client handoff', icon: '↗', className: 'portal-sales', route: 'sales.html?view=board' },
+    { role: 'Sales Manager', title: 'Sales Manager', description: 'Clients, quotations, payments and receipts', icon: '▤', className: 'portal-manager', route: 'sales_manager.html?view=quotations' },
+    { role: 'Marketing', title: 'Marketing', description: 'Instagram, LinkedIn, Ads and call centre', icon: '✳', className: 'portal-marketing', route: 'marketing.html?view=overview' },
+    { role: 'Finance', title: 'Finance', description: 'Existing finance dashboard and invoicing', icon: '₹', className: 'portal-finance', route: 'finance.html?view=pnl' }
   ];
 
   function audit(actor, action, severity) {
@@ -26,12 +26,18 @@
       return '<button type="button" class="portal-choice ' + portal.className + '" data-role="' + portal.role + '">' +
         '<span class="portal-choice-icon" aria-hidden="true">' + portal.icon + '</span>' +
         '<span class="portal-choice-copy"><strong>' + portal.title + '</strong><small>' + portal.description + '</small></span>' +
-        '<span class="portal-choice-arrow" aria-hidden="true">→</span></button>';
+        '<span class="portal-choice-arrow" aria-hidden="true">Open →</span></button>';
     }).join('');
 
     grid.querySelectorAll('[data-role]').forEach(function (button) {
       button.addEventListener('click', function () {
         const selected = PORTALS.find(function (portal) { return portal.role === button.dataset.role; });
+        let activeUser = null;
+        try { activeUser = JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch (error) {}
+        if (activeUser && activeUser.status === 'Active' && activeUser.role === selected.role) {
+          window.location.href = selected.route;
+          return;
+        }
         document.getElementById('selectedPortalRole').value = selected.role;
         document.getElementById('selectedPortalName').textContent = selected.title;
         document.getElementById('portalTitle').textContent = selected.title + ' workspace';
